@@ -15,19 +15,16 @@ public class WolfGame implements Runnable {
 	private List<Player> players;
 	private Map<Player, Role> playerRoles;
 	
-	private Map<Player, Player> votes;
-	private Map<Player, Integer> voteCounts;
-	
 	private GameState state;
+	
+	private VoteService<Player> voteService;
 
 	public WolfGame(List<Role> roles) {
 		this.roles = roles;
 		this.players = new ArrayList<Player>();
 		this.playerRoles = new HashMap<Player, Role>();
-		
-		this.votes = new HashMap<Player, Player>();
-		this.voteCounts = new HashMap<Player, Integer>();
-		
+
+		this.voteService = new VoteService<Player>(players);
 		this.state = GameState.STARTING;
 	}
 	
@@ -53,32 +50,32 @@ public class WolfGame implements Runnable {
 		
 		while(state != GameState.GAMEOVER) {
 			
-			boolean wolfWin = didWolvesWin();
-			if (!wolfWin) {
-				Player lynch = doDaytime();
-				if (lynch == null) {
-					System.out.println("The villagers decide not to lynch anyone today");
-				} else {
-					System.out.println("The villages decide to lynch "+lynch+" who turns out to be a "+playerRoles.get(lynch));
-					players.remove(lynch);
-				}
-			} else {
+			if (didVillagersWin() || didWolvesWin()) {
 				state = GameState.GAMEOVER;
+				break;
 			}
 			
-			boolean villagerWin = didVillagersWin();
-			if (!villagerWin) {
-				Player eaten = doNighttime();
-				if (eaten == null) {
-					System.out.println("The villagers wake and find no one was eaten");
-				} else {
-					System.out.println("The villages wake to find "+eaten+" dead, who turns out to be a "+playerRoles.get(eaten));
-					players.remove(eaten);
-				}
+			Player lynch = doDaytime();
+			if (lynch == null) {
+				System.out.println("The villagers decide not to lynch anyone today");
 			} else {
-				state = GameState.GAMEOVER;
+				System.out.println("The villages decide to lynch "+lynch+" who turns out to be a "+playerRoles.get(lynch));
+				players.remove(lynch);
 			}
 
+			if (didVillagersWin() || didWolvesWin()) {
+				state = GameState.GAMEOVER;
+				break;
+			}
+
+			Player eaten = doNighttime();
+			if (eaten == null) {
+				System.out.println("The villagers wake and find no one was eaten");
+			} else {
+				System.out.println("The villages wake to find "+eaten+" dead, who turns out to be a "+playerRoles.get(eaten));
+				players.remove(eaten);
+			}
+			
 		}
 		
 		System.out.println("Game over, winners are: "+getWinningTeam());
@@ -86,8 +83,7 @@ public class WolfGame implements Runnable {
 	
 	public synchronized Player doDaytime() {
 		state = GameState.DAYTIME;
-		voteCounts.clear();
-		votes.clear();
+		voteService = new VoteService<Player>(players);
 		
 		System.out.println("[GAME] It is now daytime");
 		System.out.println("[GAME] alive players are: "+players);
@@ -96,22 +92,18 @@ public class WolfGame implements Runnable {
 			player.notifyDaytime(new DaytimePlayerController(player, this));
 		}
 		
-		//TODO block until vote
-		Player votedFor = null;
-	    while(votes.size() != players.size()) {
-	        try {
-	            wait();
-	        } catch (InterruptedException e) {}
-    		votedFor = getHighestVote(players.size()/2);
-	    }
+		while (!voteService.isFinished()) {
+			try {
+				wait();
+			} catch (InterruptedException ex) {}
+		}
 		
-		return votedFor;
+		return voteService.getResult();
 	}
 	
 	public synchronized Player doNighttime() {
 		state = GameState.NIGHTTIME;
-		voteCounts.clear();
-		votes.clear();
+		voteService = new VoteService<Player>(getWolves());
 		
 		System.out.println("[GAME] It is now night time");
 		System.out.println("[GAME] alive players are: "+players);
@@ -121,15 +113,25 @@ public class WolfGame implements Runnable {
 		}
 		
 		//TODO block until vote
-		Player votedFor = null;
-	    while(votedFor == null) {
-	        try {
-	            wait();
-	        } catch (InterruptedException e) {}
-    		votedFor = getHighestVote(1);
-	    }
+		while (!voteService.isFinished()) {
+			try {
+				wait();
+			} catch (InterruptedException ex) {}
+		}
 		
-		return votedFor;
+		return voteService.getResult();
+	}
+	
+	private List<Player> getWolves() {
+		List<Player> wolves = new ArrayList<Player>();
+		for (Player player : players) {
+			Role role = playerRoles.get(player);
+			
+			if (role == Role.WOLF) {
+				wolves.add(player);
+			}
+		}
+		return wolves;
 	}
 	
 	public void notifyRoles() {
@@ -146,28 +148,12 @@ public class WolfGame implements Runnable {
 	
 	public Team getWinningTeam() {
 		
-		int numWolves = 0;
-		int numVillagers = 0;
-		
-		Iterator<Entry<Player, Role>> itr = playerRoles.entrySet().iterator();
-		
-		while(itr.hasNext()) {
-			Entry<Player, Role> entry = itr.next();
-			if (entry.getValue() == Role.VILLAGER || entry.getValue() == Role.SEER) {
-				numVillagers++;
-			}
-			
-			if (entry.getValue() == Role.WOLF) {
-				numWolves++;
-			}
-		}
-		
-		if (numWolves >= numVillagers) {
-			return Team.WOLVES;
-		}
-		
-		if (numWolves == 0) {
+		if (didVillagersWin()) {
 			return Team.VILLAGERS;
+		}
+		
+		if (didWolvesWin()) {
+			return Team.WOLVES;
 		}
 		
 		return null;
@@ -192,81 +178,23 @@ public class WolfGame implements Runnable {
 	}
 	
 	public void enterVote(Player voter, Player candidate) {
-		if (votes.containsKey(voter)) {
-			Player oldVote = votes.get(voter);
-			Integer oldVoteCount = voteCounts.get(oldVote);
-			voteCounts.put(oldVote, oldVoteCount-1);
-		}
-		
-		votes.put(voter, candidate);
-		Integer votes = voteCounts.get(candidate);
-		if (votes == null) {
-			votes = 0;
-		}
-		
-		voteCounts.put(candidate, votes + 1);
+		voteService.vote(voter, candidate);
 		
 		System.out.println("[GAME] "+voter+" voted for "+candidate);
 		notifyAll();
 	}
 	
 	private boolean didVillagersWin() {
-		int numWolves = 0;
-		
-		Iterator<Entry<Player, Role>> itr = playerRoles.entrySet().iterator();
-		
-		while(itr.hasNext()) {
-			Entry<Player, Role> entry = itr.next();
-			
-			if (entry.getValue() == Role.WOLF) {
-				numWolves++;
-			}
-		}
-		
-		return numWolves == 0;
+		List<Player> wolves = getWolves();
+		return wolves.isEmpty();
 	}
 	
 	private boolean didWolvesWin() {
-		int numWolves = 0;
-		int numVillagers = 0;
-		
-		Iterator<Entry<Player, Role>> itr = playerRoles.entrySet().iterator();
-		
-		while(itr.hasNext()) {
-			Entry<Player, Role> entry = itr.next();
-			if (entry.getValue() == Role.VILLAGER || entry.getValue() == Role.SEER) {
-				numVillagers++;
-			}
-			
-			if (entry.getValue() == Role.WOLF) {
-				numWolves++;
-			}
-		}
-		
-		return numWolves > numVillagers;
+		List<Player> wolves = getWolves();
+		int villagers = players.size() - wolves.size();
+		return villagers <= wolves.size();
 	}
 	
-
-	private Player getHighestVote(int minVotes) {
-		Player highest = null;
-		Integer count = 0;
-		
-		System.out.println("minVotes: "+minVotes);
-		for (Player player : players) {
-			Integer votes = voteCounts.get(player);
-			if (votes != null && votes > count) {
-				highest = player;
-				count = votes;
-			}
-		}
-		
-		System.out.println("count: "+count);
-		if (count >= minVotes) {
-			return highest;
-		} else {
-			return null;
-		}
-	}
 	
 	public Role getPlayerRole(Player player) {
 		return playerRoles.get(player);
@@ -275,12 +203,7 @@ public class WolfGame implements Runnable {
 	public synchronized void timeout() {
 		
 		System.out.println("admin caused timeout");
-		
-		for (Player p : players) {
-			if (!votes.containsKey(p)) {
-				votes.put(p, null);
-			}
-		}
+		voteService.setSuddenDeath(true);
 		
 		notifyAll();
 	}
