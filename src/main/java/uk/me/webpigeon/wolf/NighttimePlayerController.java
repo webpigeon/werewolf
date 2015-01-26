@@ -9,10 +9,12 @@ import java.util.List;
 public class NighttimePlayerController implements PlayerController {
 	private final Player player;
 	private final WolfGame game;
+	private boolean hasSeen;
 
 	public NighttimePlayerController(Player player, WolfGame game) {
 		this.player = player;
 		this.game = game;
+		this.hasSeen = false;
 	}
 
 	public void takeAction(String action) {
@@ -37,6 +39,15 @@ public class NighttimePlayerController implements PlayerController {
 		
 		if (role == Role.SEER) {
 			//see 1 player and return role
+			
+			if ("see".equalsIgnoreCase(args[0]) && !hasSeen) {
+				Player seenPlayer = game.getPlayerByName(args[1]);
+				if (seenPlayer != null) {
+					Role seenRole = game.getPlayerRole(seenPlayer);
+					player.notifyRole(seenPlayer, seenRole);
+					hasSeen = true;
+				}
+			}
 		}
 		
 		
@@ -67,5 +78,11 @@ public class NighttimePlayerController implements PlayerController {
 		
 		return actions;
 	}
+	
+	@Override
+	public List<Player> getPlayers() {
+		return game.getAlivePlayers();
+	}
+
 	
 }

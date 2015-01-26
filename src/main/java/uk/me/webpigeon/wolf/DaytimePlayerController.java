@@ -36,4 +36,9 @@ public class DaytimePlayerController implements PlayerController {
 		return actions;
 	}
 
+	@Override
+	public List<Player> getPlayers() {
+		return game.getAlivePlayers();
+	}
+
 }

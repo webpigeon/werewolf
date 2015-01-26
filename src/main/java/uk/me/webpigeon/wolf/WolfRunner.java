@@ -8,15 +8,16 @@ public class WolfRunner {
 
 	public static void main(String[] args) {
 		
-		List<Role> roles = Arrays.asList(Role.WOLF, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER);
+		List<Role> roles = Arrays.asList(Role.WOLF, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.SEER);
 		WolfGame game = new WolfGame(roles);
 		
-		game.add(new RandomPlayer("Fred"));
-		game.add(new RandomPlayer("John"));
-		game.add(new RandomPlayer("Bob"));
-		game.add(new RandomPlayer("Wolfgang"));
-		game.add(new RandomPlayer("Dave"));
-		game.add(new RandomPlayer("Jackie"));
+		game.add(new BasicIntelligencePlayer("Fred"));
+		game.add(new BasicIntelligencePlayer("John"));
+		game.add(new BasicIntelligencePlayer("Bob"));
+		game.add(new BasicIntelligencePlayer("Wolfgang"));
+		game.add(new BasicIntelligencePlayer("Pebbles"));
+		game.add(new BasicIntelligencePlayer("Jackie"));
+		game.add(new BasicIntelligencePlayer("Sarah"));
 		
 		Thread gameThread = new Thread(game);
 		gameThread.start();

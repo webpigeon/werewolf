@@ -1,14 +1,18 @@
 package uk.me.webpigeon.wolf;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class AbstractPlayer implements Player {
 	private String name;
 	private Role role;
+	protected Map<String, Role> roles;
 	
 	public AbstractPlayer(String name) {
 		this.name = name;
 		this.role = null;
+		this.roles = new TreeMap<String, Role>();
 	}
 	
 	public Role getRole() {
@@ -26,8 +30,10 @@ public class AbstractPlayer implements Player {
 	public void notifyRole(Player player, Role role) {
 		if (player.equals(this)) {
 			this.role = role;
-			think("I'm a "+role);
 		}
+		
+		roles.put(player.getName(), role);
+		think("I think that "+player.getName()+" is a "+role);
 	}
 
 	public void notifyDaytime(PlayerController controller) {
