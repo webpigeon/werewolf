@@ -9,5 +9,6 @@ public interface PlayerController {
 	public void takeAction(String action);
 	public List<String> getActions();
 	public List<Player> getPlayers();
+	public GameState getStage();
 	
 }

@@ -7,4 +7,9 @@ public class NoopPlayer extends AbstractPlayer {
 		
 	}
 
+	@Override
+	protected void takeAction(PlayerController controller) {
+		
+	}
+
 }

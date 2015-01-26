@@ -2,6 +2,7 @@ package uk.me.webpigeon.wolf;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,7 +16,7 @@ public class VoteService <T> {
 		this.votes = new HashMap<T, T>();
 		this.totals = new HashMap<T, Integer>();
 		this.voteTokens = voteTokens;
-		this.suddenDeath = true;
+		this.suddenDeath = false;
 	}
 	
 	public void setSuddenDeath(boolean t) {
@@ -39,7 +40,7 @@ public class VoteService <T> {
 	}
 
 	public boolean isFinished() {
-		return votes.size() == voteTokens.size();
+		return votes.size() == voteTokens.size() || suddenDeath;
 	}
 
 	public T getResult() {

@@ -5,8 +5,10 @@ import java.util.List;
 
 import uk.me.webpigeon.wolf.BasicIntelligencePlayer;
 import uk.me.webpigeon.wolf.NoopPlayer;
+import uk.me.webpigeon.wolf.RandomPlayer;
 import uk.me.webpigeon.wolf.Role;
 import uk.me.webpigeon.wolf.WolfGame;
+import uk.me.webpigeon.wolf.WolfUtils;
 
 public class GraphicalWolf {
 	
@@ -15,7 +17,11 @@ public class GraphicalWolf {
 		
 		WolfFrame frame = new WolfFrame();
 		frame.start();
-		GraphicalObserver observer = new GraphicalObserver(frame, game);
+		
+		WolfController controller = new WolfController(frame, game);
+		
+		
+		GraphicalObserver observer = new GraphicalObserver(frame, controller);
 		game.addObserver(observer);
 		
 		Thread gameThread = new Thread(game);
@@ -26,13 +32,13 @@ public class GraphicalWolf {
 		List<Role> roles = Arrays.asList(Role.WOLF, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.SEER);
 		WolfGame game = new WolfGame(roles);
 		
-		game.add(new NoopPlayer("Fred"));
-		game.add(new BasicIntelligencePlayer("John"));
-		game.add(new BasicIntelligencePlayer("Bob"));
-		game.add(new BasicIntelligencePlayer("Wolfgang"));
-		game.add(new BasicIntelligencePlayer("Pebbles"));
-		game.add(new BasicIntelligencePlayer("Jackie"));
-		game.add(new BasicIntelligencePlayer("Sarah"));
+		game.add(WolfUtils.buildRandomPlayer("Fred"));
+		game.add(WolfUtils.buildSmartPlayer("John"));
+		game.add(WolfUtils.buildSmartPlayer("Bob"));
+		game.add(WolfUtils.buildSmartPlayer("Wolfgang"));
+		game.add(WolfUtils.buildSmartPlayer("Pebbles"));
+		game.add(WolfUtils.buildSmartPlayer("Jackie"));
+		game.add(WolfUtils.buildSmartPlayer("Sarah"));
 		
 		return game;
 	}

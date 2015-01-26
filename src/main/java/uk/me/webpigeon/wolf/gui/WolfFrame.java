@@ -4,16 +4,21 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
@@ -27,8 +32,10 @@ public class WolfFrame {
 	private JPanel cards;
 	private JPanel dayScreen;
 	private JPanel nightScreen;
+	private JProgressBar progressBar;
 	private CardLayout layout;
 	private DefaultListModel<Player> players;
+	private DefaultBoundedRangeModel progressBarModel;
 	
 	private HTMLEditorKit kit;
 	private HTMLDocument document;
@@ -41,21 +48,15 @@ public class WolfFrame {
 	}
 	
 	private void initGUI() {
+		
 		frame.setTitle("AI Warewolf");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(800, 600));
 		
-		layout = new CardLayout();
-		cards = new JPanel(layout);
 		
-		dayScreen.add(new JLabel("daytime"));
-		dayScreen.setBackground(Color.CYAN);
-		cards.add(dayScreen, "day");
-		nightScreen.add(new JLabel("night time"));
-		nightScreen.setBackground(Color.DARK_GRAY);
-		cards.add(nightScreen, "night");
-		
-		frame.add(cards, BorderLayout.NORTH);
+		progressBarModel = new DefaultBoundedRangeModel();
+		JProgressBar progressBar = new JProgressBar(progressBarModel);
+		frame.add(progressBar, BorderLayout.NORTH);
 		
 		players = new DefaultListModel<Player>();
 		JList<Player> playerList = new JList<Player>(players);
@@ -88,17 +89,14 @@ public class WolfFrame {
 		}
 	}
 	
-	
 	public void start() {
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
-	public void setDaytime(boolean tf) {
-		if (tf) {
-			layout.show(cards, "day");
-		} else {
-			layout.show(cards, "night");
-		}
+
+	public void notifyTicks(int roundTicksLeft, Integer ticksPerRound) {	
+		progressBarModel.setMinimum(0);
+		progressBarModel.setMaximum(ticksPerRound);
+		progressBarModel.setValue(ticksPerRound - roundTicksLeft);
 	}
 }

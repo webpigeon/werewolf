@@ -23,4 +23,9 @@ public class ReadOnlyController implements PlayerController {
 		return game.getAlivePlayers();
 	}
 
+	@Override
+	public GameState getStage() {
+		return null;
+	}
+
 }

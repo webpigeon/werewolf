@@ -9,14 +9,8 @@ public class RandomPlayer extends AbstractPlayer {
 		super(name);
 	}
 	
-	public void notifyDaytime(PlayerController controller) {	
-		List<String> actions = controller.getActions();
-		
-		Collections.shuffle(actions);
-		controller.takeAction(actions.get(0));
-	}
-
-	public void notifyNighttime(PlayerController controller) {
+	@Override
+	protected void takeAction(PlayerController controller) {
 		List<String> actions = controller.getActions();
 		
 		Collections.shuffle(actions);

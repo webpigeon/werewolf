@@ -11,42 +11,42 @@ public class BasicIntelligencePlayer extends RandomPlayer {
 	}
 	
 	public void notifyDaytime(PlayerController controller) {	
-		Role myRole = getRole();
-		if (myRole == Role.VILLAGER) {
-			super.notifyNighttime(controller);
-			return;
-		}
-		
-		String selected = selectPlayer(getScores(), controller.getPlayers());
-		
-		if (myRole == Role.SEER) {
-			controller.takeAction("lynch "+selected);
-		}
-		
-		if (myRole == Role.WOLF) {
-			controller.takeAction("lynch "+selected);
-		}
+		super.notifyNighttime(controller);
 	}
 
 	public void notifyNighttime(PlayerController controller) {
+		super.notifyNighttime(controller);
+		
+	}
+	
+	@Override
+	protected void takeAction(PlayerController controller) {
 		Role myRole = getRole();
 		if (myRole == Role.VILLAGER) {
-			super.notifyNighttime(controller);
+			super.takeAction(controller);
 			return;
 		}
 		
 		String selected = selectPlayer(getScores(), controller.getPlayers());
-		
-		if (myRole == Role.SEER) {
-			controller.takeAction("see "+selected);
+		if (controller.getStage() == GameState.DAYTIME) {
+			if (myRole == Role.SEER) {
+				controller.takeAction("lynch "+selected);
+			}
+			
+			if (myRole == Role.WOLF) {
+				controller.takeAction("lynch "+selected);
+			}
+		} else {
+			if (myRole == Role.SEER) {
+				controller.takeAction("see "+selected);
+			}
+			
+			if (myRole == Role.WOLF) {
+				controller.takeAction("eat "+selected);
+			}
 		}
-		
-		if (myRole == Role.WOLF) {
-			controller.takeAction("eat "+selected);
-		}
-		
 	}
-	
+
 	private String selectPlayer(Map<String, Integer> scores, List<Player> players) {
 		Player bestPlayer = null;
 		int bestScore = Integer.MIN_VALUE;

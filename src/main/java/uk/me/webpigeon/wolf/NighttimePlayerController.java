@@ -32,7 +32,7 @@ public class NighttimePlayerController implements PlayerController {
 			
 			if ("eat".equalsIgnoreCase(args[0])) {
 				Player eatee = game.getPlayerByName(args[1]);
-				game.enterVote(player, eatee);
+				game.enterVote(player, eatee, false);
 			}
 			
 		}
@@ -82,6 +82,11 @@ public class NighttimePlayerController implements PlayerController {
 	@Override
 	public List<Player> getPlayers() {
 		return game.getAlivePlayers();
+	}
+
+	@Override
+	public GameState getStage() {
+		return GameState.NIGHTTIME;
 	}
 
 	

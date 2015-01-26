@@ -112,6 +112,7 @@ public class WolfGame implements Runnable {
 		}
 		
 		while (!voteService.isFinished()) {
+			System.out.println("vote not finished");
 			try {
 				wait();
 			} catch (InterruptedException ex) {}
@@ -174,6 +175,20 @@ public class WolfGame implements Runnable {
 		}
 	}
 	
+	private void notifyPublicVote(Player voter, Player votee) {
+		notifyVote(voter, votee, players);
+	}
+	
+	private void notifyVote(Player voter, Player votee, List<Player> voters) {
+		for (Player p : voters) {
+			p.notifyVote(voter.getName(), votee.getName());
+		}
+		
+		for (GameObserver o : observers) {
+			o.notifyVote(voter.getName(), votee.getName());
+		}
+	}
+	
 	public Team getWinningTeam() {
 		
 		if (didVillagersWin()) {
@@ -205,8 +220,14 @@ public class WolfGame implements Runnable {
 		
 	}
 	
-	public void enterVote(Player voter, Player candidate) {
+	public synchronized void enterVote(Player voter, Player candidate, boolean isPublic) {
 		voteService.vote(voter, candidate);
+		
+		if (isPublic) {
+			notifyPublicVote(voter, candidate);
+		} else {
+			notifyVote(voter, candidate, getWolves());
+		}
 		
 		System.out.println("[GAME] "+voter+" voted for "+candidate);
 		notifyAll();

@@ -19,7 +19,7 @@ public class DaytimePlayerController implements PlayerController {
 		
 		if ("lynch".equalsIgnoreCase(args[0])) {
 			Player lynchee = game.getPlayerByName(args[1]);
-			game.enterVote(player, lynchee);
+			game.enterVote(player, lynchee, true);
 		}
 		
 	}
@@ -41,4 +41,9 @@ public class DaytimePlayerController implements PlayerController {
 		return game.getAlivePlayers();
 	}
 
+	@Override
+	public GameState getStage() {
+		return GameState.DAYTIME;
+	}
+	
 }

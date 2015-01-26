@@ -4,15 +4,14 @@ import uk.me.webpigeon.wolf.GameObserver;
 import uk.me.webpigeon.wolf.Player;
 import uk.me.webpigeon.wolf.PlayerController;
 import uk.me.webpigeon.wolf.Role;
-import uk.me.webpigeon.wolf.WolfGame;
 
 public class GraphicalObserver implements GameObserver {
 	private WolfFrame frame;
-	private WolfGame game;
+	private WolfController wolfController;
 	
-	public GraphicalObserver(WolfFrame frame, WolfGame game) {
+	public GraphicalObserver(WolfFrame frame, WolfController controller) {
 		this.frame = frame;
-		this.game = game;
+		this.wolfController = controller;
 	}
 
 	@Override
@@ -22,16 +21,21 @@ public class GraphicalObserver implements GameObserver {
 
 	@Override
 	public void notifyDaytime(PlayerController controller) {
-		frame.setDaytime(true);
-		frame.setPlayers(controller.getPlayers());
-		
+		wolfController.setRoundStarted(true);
 		frame.apppendText("It is now daytime");
+		frame.setPlayers(controller.getPlayers());
 	}
 
 	@Override
 	public void notifyNighttime(PlayerController controller) {
-		frame.setDaytime(false);
+		wolfController.setRoundStarted(false);
+		frame.apppendText("It is now nighttime");
 		frame.setPlayers(controller.getPlayers());
+	}
+
+	@Override
+	public void notifyVote(String voter, String votee) {
+		frame.apppendText("[*] <b>"+voter+"</b> voted for <b>"+votee+"</b>");
 	}
 
 }
