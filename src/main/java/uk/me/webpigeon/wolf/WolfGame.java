@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 public class WolfGame implements Runnable {
 	private final Integer MIN_PLAYERS = 5;
 	
+	private List<GameObserver> observers;
 	private List<Role> roles;
 	private List<Player> players;
 	private Map<Player, Role> playerRoles;
@@ -20,6 +21,7 @@ public class WolfGame implements Runnable {
 	private VoteService<Player> voteService;
 
 	public WolfGame(List<Role> roles) {
+		this.observers = new ArrayList<GameObserver>();
 		this.roles = roles;
 		this.players = new ArrayList<Player>();
 		this.playerRoles = new HashMap<Player, Role>();
@@ -36,11 +38,23 @@ public class WolfGame implements Runnable {
 		players.add(player);
 	}
 	
+	/**
+	 * A spectator with perfect knowledge
+	 * 
+	 * @param observer the observer callback
+	 */
+	public void addObserver(GameObserver observer) {
+		if (state != GameState.STARTING) {
+			throw new RuntimeException("The game has already started");
+		}
+		
+		observers.add(observer);
+	}
+	
 	public void run() {
 		
 		state = GameState.INIT;
-		
-		
+			
 		System.out.println("Welcome to AI warewolf");
 		System.out.println("Players are: "+players);
 		
@@ -88,6 +102,11 @@ public class WolfGame implements Runnable {
 		System.out.println("[GAME] It is now daytime");
 		System.out.println("[GAME] alive players are: "+players);
 		
+		ReadOnlyController controller = new ReadOnlyController(this);
+		for (GameObserver observer : observers) {
+			observer.notifyDaytime(controller);
+		}
+		
 		for (Player player : players) {
 			player.notifyDaytime(new DaytimePlayerController(player, this));
 		}
@@ -107,6 +126,11 @@ public class WolfGame implements Runnable {
 		
 		System.out.println("[GAME] It is now night time");
 		System.out.println("[GAME] alive players are: "+players);
+		
+		ReadOnlyController controller = new ReadOnlyController(this);
+		for (GameObserver observer : observers) {
+			observer.notifyNighttime(controller);
+		}
 		
 		for (Player player : players) {
 			player.notifyNighttime(new NighttimePlayerController(player, this));
@@ -143,6 +167,10 @@ public class WolfGame implements Runnable {
 			Role r = entry.getValue();
 			
 			p.notifyRole(p, r);
+			
+			for (GameObserver observer : observers) {
+				observer.notifyRole(p, r);
+			}
 		}
 	}
 	
