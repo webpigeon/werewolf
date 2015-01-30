@@ -23,7 +23,7 @@ public class VoteService <T> {
 		this.suddenDeath = t;
 	}
 	
-	public void vote(T voter, T votee) {
+	public synchronized void vote(T voter, T votee) {
 		T currentVote = votes.get(voter);
 		if (currentVote != null) {
 			int totalVotes = getVotesFor(currentVote);
@@ -34,16 +34,16 @@ public class VoteService <T> {
 		totals.put(votee, getVotesFor(votee) + 1);
 	}
 	
-	public int getVotesFor(T votee) {
+	public synchronized int getVotesFor(T votee) {
 		Integer voteTotal = totals.get(votee);
 		return voteTotal==null?0:voteTotal;
 	}
 
-	public boolean isFinished() {
+	public synchronized boolean isFinished() {
 		return votes.size() == voteTokens.size() || suddenDeath;
 	}
 
-	public T getResult() {
+	public synchronized T getResult() {
 		return getHighest();
 	}
 	

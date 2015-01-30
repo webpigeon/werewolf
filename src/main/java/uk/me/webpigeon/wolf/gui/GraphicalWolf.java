@@ -1,12 +1,8 @@
 package uk.me.webpigeon.wolf.gui;
 
-import java.util.Arrays;
 import java.util.List;
 
-import uk.me.webpigeon.wolf.BasicIntelligencePlayer;
-import uk.me.webpigeon.wolf.NoopPlayer;
-import uk.me.webpigeon.wolf.RandomPlayer;
-import uk.me.webpigeon.wolf.Role;
+import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.WolfGame;
 import uk.me.webpigeon.wolf.WolfUtils;
 
@@ -29,7 +25,7 @@ public class GraphicalWolf {
 	}
 	
 	private static WolfGame buildGame() {
-		List<Role> roles = Arrays.asList(Role.WOLF, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.SEER);
+		List<RoleI> roles = WolfUtils.buildRoleList();
 		WolfGame game = new WolfGame(roles);
 		
 		game.add(WolfUtils.buildRandomPlayer("Fred"));

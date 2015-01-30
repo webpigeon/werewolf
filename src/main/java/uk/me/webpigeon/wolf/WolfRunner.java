@@ -8,7 +8,7 @@ public class WolfRunner {
 
 	public static void main(String[] args) {
 		
-		List<Role> roles = Arrays.asList(Role.WOLF, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.VILLAGER, Role.SEER);
+		List<RoleI> roles = WolfUtils.buildRoleList();
 		WolfGame game = new WolfGame(roles);
 		
 		game.add(new BasicIntelligencePlayer("Fred"));

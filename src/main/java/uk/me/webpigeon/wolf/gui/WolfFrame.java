@@ -2,30 +2,20 @@ package uk.me.webpigeon.wolf.gui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.parser.ParserDelegator;
-
-import uk.me.webpigeon.wolf.Player;
 
 public class WolfFrame {
 	private JFrame frame;
@@ -34,7 +24,7 @@ public class WolfFrame {
 	private JPanel nightScreen;
 	private JProgressBar progressBar;
 	private CardLayout layout;
-	private DefaultListModel<Player> players;
+	private DefaultListModel<String> players;
 	private DefaultBoundedRangeModel progressBarModel;
 	
 	private HTMLEditorKit kit;
@@ -58,8 +48,8 @@ public class WolfFrame {
 		JProgressBar progressBar = new JProgressBar(progressBarModel);
 		frame.add(progressBar, BorderLayout.NORTH);
 		
-		players = new DefaultListModel<Player>();
-		JList<Player> playerList = new JList<Player>(players);
+		players = new DefaultListModel<String>();
+		JList<String> playerList = new JList<String>(players);
 		frame.add(playerList, BorderLayout.WEST);
 		
 		
@@ -74,9 +64,9 @@ public class WolfFrame {
 		frame.add(console, BorderLayout.CENTER);
 	}
 
-	public void setPlayers(Collection<Player> alivePlayers) {
+	public void setPlayers(Collection<String> alivePlayers) {
 		players.clear();
-		for (Player player : alivePlayers) {
+		for (String player : alivePlayers) {
 			players.add(0, player);
 		}
 	}

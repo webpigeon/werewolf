@@ -7,35 +7,41 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 public class WolfGame implements Runnable {
 	private final Integer MIN_PLAYERS = 5;
 	
+	private Map<GameObserver, GameController> controllers;
 	private List<GameObserver> observers;
-	private List<Role> roles;
-	private List<Player> players;
-	private Map<Player, Role> playerRoles;
+	private List<RoleI> roles;
+	private List<GameObserver> players;
+	private Map<GameObserver, RoleI> playerRoles;
 	
 	private GameState state;
 	
-	private VoteService<Player> voteService;
+	private VoteService<GameObserver> voteService;
 
-	public WolfGame(List<Role> roles) {
+	public WolfGame(List<RoleI> roles) {
+		this.controllers = new HashMap<GameObserver, GameController>();
 		this.observers = new ArrayList<GameObserver>();
 		this.roles = roles;
-		this.players = new ArrayList<Player>();
-		this.playerRoles = new HashMap<Player, Role>();
+		this.players = new Vector<GameObserver>();
+		this.playerRoles = new HashMap<GameObserver, RoleI>();
 
-		this.voteService = new VoteService<Player>(players);
+		this.voteService = new VoteService<GameObserver>(players);
 		this.state = GameState.STARTING;
 	}
 	
-	public void add(Player player) {
+	public void add(GameObserver player) {
 		if (state != GameState.STARTING) {
 			throw new RuntimeException("The game has already started");
 		}
-			
+		
+		GameController controller = new SimpleGameController(player, this);
 		players.add(player);
+		player.bind(controller);
+		controllers.put(player, controller);
 	}
 	
 	/**
@@ -60,45 +66,33 @@ public class WolfGame implements Runnable {
 		
 		assignRoles();
 		notifyRoles();
-		state = GameState.DAYTIME;
 		
-		while(state != GameState.GAMEOVER) {
-			
-			if (didVillagersWin() || didWolvesWin()) {
-				state = GameState.GAMEOVER;
-				break;
-			}
-			
-			Player lynch = doDaytime();
-			if (lynch == null) {
-				System.out.println("The villagers decide not to lynch anyone today");
-			} else {
-				System.out.println("The villages decide to lynch "+lynch+" who turns out to be a "+playerRoles.get(lynch));
-				players.remove(lynch);
-			}
-
-			if (didVillagersWin() || didWolvesWin()) {
-				state = GameState.GAMEOVER;
-				break;
-			}
-
-			Player eaten = doNighttime();
-			if (eaten == null) {
-				System.out.println("The villagers wake and find no one was eaten");
-			} else {
-				System.out.println("The villages wake to find "+eaten+" dead, who turns out to be a "+playerRoles.get(eaten));
-				players.remove(eaten);
-			}
-			
-		}
-		
-		System.out.println("Game over, winners are: "+getWinningTeam());
+		doDaytime();
 	}
 	
-	public synchronized Player doDaytime() {
-		state = GameState.DAYTIME;
-		voteService = new VoteService<Player>(players);
+	private void processVotes() {
+		String voteType = state==GameState.DAYTIME? "lynch" : "eaten";
 		
+		if (voteService.isFinished()) {
+			GameObserver observer = voteService.getResult();
+			
+			if (observer != null) {
+				players.remove(observer);
+				notifyDeath(observer.getName(), voteType);
+			} else {
+				notifyDeath(null, voteType);
+			}
+			
+			switchState();
+		}
+		
+	}
+	
+	public GameObserver doDaytime() {
+		state = GameState.DAYTIME;
+		voteService = new VoteService<GameObserver>(players);
+		
+		notifyGameStateChange(GameState.DAYTIME);
 		System.out.println("[GAME] It is now daytime");
 		System.out.println("[GAME] alive players are: "+players);
 		
@@ -107,23 +101,18 @@ public class WolfGame implements Runnable {
 			observer.notifyDaytime(controller);
 		}
 		
-		for (Player player : players) {
-			player.notifyDaytime(new DaytimePlayerController(player, this));
+		for (GameObserver player : players) {
+			player.notifyDaytime(controller);
 		}
 		
-		while (!voteService.isFinished()) {
-			System.out.println("vote not finished");
-			try {
-				wait();
-			} catch (InterruptedException ex) {}
-		}
-		
-		return voteService.getResult();
+		return null;
 	}
 	
-	public synchronized Player doNighttime() {
+	public GameObserver doNighttime() {
 		state = GameState.NIGHTTIME;
-		voteService = new VoteService<Player>(getWolves());
+		voteService = new VoteService<GameObserver>(getWolves());
+		
+		notifyGameStateChange(GameState.NIGHTTIME);
 		
 		System.out.println("[GAME] It is now night time");
 		System.out.println("[GAME] alive players are: "+players);
@@ -133,26 +122,38 @@ public class WolfGame implements Runnable {
 			observer.notifyNighttime(controller);
 		}
 		
-		for (Player player : players) {
-			player.notifyNighttime(new NighttimePlayerController(player, this));
+		for (GameObserver player : players) {
+			player.notifyNighttime(controller);
 		}
 		
-		//TODO block until vote
-		while (!voteService.isFinished()) {
-			try {
-				wait();
-			} catch (InterruptedException ex) {}
-		}
-		
-		return voteService.getResult();
+		return null;
 	}
 	
-	private List<Player> getWolves() {
-		List<Player> wolves = new ArrayList<Player>();
-		for (Player player : players) {
-			Role role = playerRoles.get(player);
+	private void switchState() {
+		if (didVillagersWin() || didWolvesWin()) {
+			state = GameState.GAMEOVER;
+			return;
+		}
+		
+		if (state == GameState.DAYTIME) {
+			doNighttime();
+		} else {
+			doDaytime();
+		}
+	}
+	
+	private void notifyGameStateChange(GameState newState) {
+		for (GameController controller : controllers.values()) {
+			controller.setState(newState);
+		}
+	}
+	
+	private List<GameObserver> getWolves() {
+		List<GameObserver> wolves = new ArrayList<GameObserver>();
+		for (GameObserver player : players) {
+			RoleI role = playerRoles.get(player);
 			
-			if (role == Role.WOLF) {
+			if (role.isOnTeam(Team.WOLVES)) {
 				wolves.add(player);
 			}
 		}
@@ -160,32 +161,48 @@ public class WolfGame implements Runnable {
 	}
 	
 	public void notifyRoles() {
-		Iterator<Entry<Player, Role>> itr = playerRoles.entrySet().iterator();
+		Iterator<Entry<GameObserver, RoleI>> itr = playerRoles.entrySet().iterator();
 		
 		while(itr.hasNext()) {
-			Entry<Player, Role> entry = itr.next();
-			Player p = entry.getKey();
-			Role r = entry.getValue();
+			Entry<GameObserver, RoleI> entry = itr.next();
+			GameObserver p = entry.getKey();
+			RoleI r = entry.getValue();
 			
-			p.notifyRole(p, r);
+			p.notifyRole(p.getName(), r);
+			GameController c = controllers.get(p);
+			c.setRole(r);
 			
 			for (GameObserver observer : observers) {
-				observer.notifyRole(p, r);
+				observer.notifyRole(p.getName(), r);
 			}
 		}
 	}
 	
-	private void notifyPublicVote(Player voter, Player votee) {
+	private void notifyDeath(String who, String how) {
+		for (GameObserver player : players) {
+			player.notifyDeath(who, how);
+		}
+		
+		for (GameObserver player : observers) {
+			player.notifyDeath(who, how);
+		}
+	}
+	
+	private void notifyPublicVote(GameObserver voter, GameObserver votee) {
 		notifyVote(voter, votee, players);
 	}
 	
-	private void notifyVote(Player voter, Player votee, List<Player> voters) {
-		for (Player p : voters) {
-			p.notifyVote(voter.getName(), votee.getName());
+	private void notifyVote(GameObserver voter, GameObserver votee, List<GameObserver> voters) {
+		for (GameObserver p : voters) {
+			if (votee != null && voter != null) {
+				p.notifyVote(voter.getName(), votee.getName());
+			}
 		}
 		
 		for (GameObserver o : observers) {
-			o.notifyVote(voter.getName(), votee.getName());
+			if (votee != null && voter != null) {
+				o.notifyVote(voter.getName(), votee.getName());
+			}
 		}
 	}
 	
@@ -208,19 +225,25 @@ public class WolfGame implements Runnable {
 			throw new RuntimeException("not enouph players");
 		}
 		
-		List<Player> playersLeft = new ArrayList<Player>(players);
+		List<GameObserver> playersLeft = new ArrayList<GameObserver>(players);
 		Collections.shuffle(playersLeft);
 		
 		for(int i=0; i<playersLeft.size(); i++) {
-			Player p = playersLeft.get(i);
-			Role r = roles.get(i);
+			GameObserver p = playersLeft.get(i);
+			RoleI r = roles.get(i);
 			
 			playerRoles.put(p, r);
 		}
 		
 	}
 	
-	public synchronized void enterVote(Player voter, Player candidate, boolean isPublic) {
+	public synchronized void enterVote(String voterName, String candidateName, boolean isPublic) {
+		GameObserver voter = getPlayer(voterName);
+		GameObserver candidate = getPlayer(candidateName);
+		enterVote(voter, candidate, isPublic);
+	}
+	
+	private void enterVote(GameObserver voter, GameObserver candidate, boolean isPublic) {		
 		voteService.vote(voter, candidate);
 		
 		if (isPublic) {
@@ -229,23 +252,22 @@ public class WolfGame implements Runnable {
 			notifyVote(voter, candidate, getWolves());
 		}
 		
-		System.out.println("[GAME] "+voter+" voted for "+candidate);
-		notifyAll();
+		processVotes();
 	}
 	
 	private boolean didVillagersWin() {
-		List<Player> wolves = getWolves();
+		List<GameObserver> wolves = getWolves();
 		return wolves.isEmpty();
 	}
 	
 	private boolean didWolvesWin() {
-		List<Player> wolves = getWolves();
+		List<GameObserver> wolves = getWolves();
 		int villagers = players.size() - wolves.size();
 		return villagers <= wolves.size();
 	}
 	
 	
-	public Role getPlayerRole(Player player) {
+	public RoleI getPlayerRole(GameObserver player) {
 		return playerRoles.get(player);
 	}
 	
@@ -253,16 +275,20 @@ public class WolfGame implements Runnable {
 		
 		System.out.println("admin caused timeout");
 		voteService.setSuddenDeath(true);
+		processVotes();
+	}
+
+	public List<String> getAlivePlayers() {
+		List<String> playerNames = new ArrayList<String>();
+		for (GameObserver p : players) {
+			playerNames.add(p.getName());
+		}
 		
-		notifyAll();
+		return playerNames;
 	}
 
-	public List<Player> getAlivePlayers() {
-		return Collections.unmodifiableList(players);
-	}
-
-	public Player getPlayerByName(String name) {
-		for (Player player : players) {
+	public GameObserver getPlayerByName(String name) {
+		for (GameObserver player : players) {
 			if (name.equals(player.getName())) {
 				return player;
 			}
@@ -271,4 +297,28 @@ public class WolfGame implements Runnable {
 		return null;
 	}
 
+	public synchronized void sendMessage(String name, String message) {
+		for (GameObserver player : players) {
+			player.notifyMessage(name, message);
+		}
+		
+		for (GameObserver observer : observers) {
+			observer.notifyMessage(name, message);
+		}
+		
+	}
+
+	private GameObserver getPlayer(String name) {
+		for (GameObserver p : players) {
+			if (p.getName().equals(name)) {
+				return p;
+			}
+		}
+		return null;
+	}
+
+	public GameState getState() {
+		return state;
+	}
+	
 }

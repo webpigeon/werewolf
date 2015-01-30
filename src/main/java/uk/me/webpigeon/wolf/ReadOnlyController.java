@@ -19,13 +19,17 @@ public class ReadOnlyController implements PlayerController {
 	}
 
 	@Override
-	public List<Player> getPlayers() {
+	public List<String> getPlayers() {
 		return game.getAlivePlayers();
 	}
 
 	@Override
 	public GameState getStage() {
 		return null;
+	}
+	
+	public void talk(String message) {
+		//you're a spectator, you don't get to do anything.
 	}
 
 }
