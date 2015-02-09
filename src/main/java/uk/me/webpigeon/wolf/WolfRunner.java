@@ -11,13 +11,13 @@ public class WolfRunner {
 		List<RoleI> roles = WolfUtils.buildRoleList();
 		WolfGame game = new WolfGame(roles);
 		
-		game.add(new BasicIntelligencePlayer("Fred"));
-		game.add(new BasicIntelligencePlayer("John"));
-		game.add(new BasicIntelligencePlayer("Bob"));
-		game.add(new BasicIntelligencePlayer("Wolfgang"));
-		game.add(new BasicIntelligencePlayer("Pebbles"));
-		game.add(new BasicIntelligencePlayer("Jackie"));
-		game.add(new BasicIntelligencePlayer("Sarah"));
+		game.add("Fred", new BasicIntelligencePlayer());
+		game.add("John", new BasicIntelligencePlayer());
+		game.add("Bob", new BasicIntelligencePlayer());
+		game.add("Wolfgang", new BasicIntelligencePlayer());
+		game.add("Pebbles", new BasicIntelligencePlayer());
+		game.add("Jackie", new BasicIntelligencePlayer());
+		game.add("Sarah", new BasicIntelligencePlayer());
 		
 		Thread gameThread = new Thread(game);
 		gameThread.start();

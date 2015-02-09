@@ -20,11 +20,11 @@ public class AbstractRole implements RoleI {
 	}
 
 	@Override
-	public Collection<ActionI> getLegalActions(GameState state, Collection<String> players) {
+	public Collection<ActionI> getLegalActions(String name, GameState state, Collection<String> players) {
 		
 		switch (state) {
 			case DAYTIME:
-				return permuteLynching(players);
+				return permuteLynching(name, players);
 		
 			default:
 				Collections.emptyList();
@@ -34,10 +34,10 @@ public class AbstractRole implements RoleI {
 		return Collections.emptyList();
 	}
 	
-	protected Collection<ActionI> permuteLynching(Collection<String> players) {
+	protected Collection<ActionI> permuteLynching(String name, Collection<String> players) {
 		List<ActionI> lynchList = new ArrayList<ActionI>(players.size());
 		lynchList.add(new AbstainAction());
-		permute(lynchList, players, LynchAction.class);
+		permute(lynchList, name, players, LynchAction.class);
 		return lynchList;
 	}
 
@@ -50,12 +50,12 @@ public class AbstractRole implements RoleI {
 	 * @param actionClass
 	 * @return
 	 */
-	protected Collection<ActionI> permute(Collection<ActionI> actionList, Collection<String> players, Class<? extends ActionI> actionClass) {
+	protected Collection<ActionI> permute(Collection<ActionI> actionList, String name, Collection<String> players, Class<? extends ActionI> actionClass) {
 		try {
-			Constructor<? extends ActionI> con = actionClass.getConstructor(String.class);
+			Constructor<? extends ActionI> con = actionClass.getConstructor(String.class, String.class);
 			
 			for (String player : players) {
-				actionList.add(con.newInstance(player));
+				actionList.add(con.newInstance(name, player));
 			}
 			
 			return actionList;
@@ -78,6 +78,11 @@ public class AbstractRole implements RoleI {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public Team[] getTeams() {
+		return new Team[]{team};
 	}
 	
 }

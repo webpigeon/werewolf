@@ -7,12 +7,14 @@ import java.util.List;
 import uk.me.webpigeon.wolf.action.ActionI;
 
 public class SimpleGameController implements GameController {
+	private String name;
 	private GameObserver player;
 	private WolfGame game;
 	private GameState state;
 	private RoleI role;
 
-	public SimpleGameController(GameObserver player, WolfGame game) {
+	public SimpleGameController(String name, GameObserver player, WolfGame game) {
+		this.name = name;
 		this.player = player;
 		this.game = game;
 		this.state = GameState.INIT;
@@ -33,7 +35,7 @@ public class SimpleGameController implements GameController {
 			return Collections.emptySet();
 		}
 		
-		return role.getLegalActions(game.getState(), game.getAlivePlayers());
+		return role.getLegalActions(name, game.getState(), game.getAlivePlayers());
 	}
 
 	public void setState(GameState state) {
@@ -53,6 +55,11 @@ public class SimpleGameController implements GameController {
 	@Override
 	public void setRole(RoleI role) {
 		this.role = role;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 }

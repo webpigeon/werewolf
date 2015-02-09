@@ -33,12 +33,12 @@ public class WolfGame implements Runnable {
 		this.state = GameState.STARTING;
 	}
 	
-	public void add(GameObserver player) {
+	public void add(String name, GameObserver player) {
 		if (state != GameState.STARTING) {
 			throw new RuntimeException("The game has already started");
 		}
 		
-		GameController controller = new SimpleGameController(player, this);
+		GameController controller = new SimpleGameController(name, player, this);
 		players.add(player);
 		player.bind(controller);
 		controllers.put(player, controller);
@@ -229,8 +229,11 @@ public class WolfGame implements Runnable {
 		Collections.shuffle(playersLeft);
 		
 		for(int i=0; i<playersLeft.size(); i++) {
+			RoleI r = WolfUtils.getDefaultRole();
 			GameObserver p = playersLeft.get(i);
-			RoleI r = roles.get(i);
+			if (roles.size() > i) {
+				r = roles.get(i);
+			}
 			
 			playerRoles.put(p, r);
 		}

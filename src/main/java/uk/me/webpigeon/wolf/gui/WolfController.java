@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
+import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.WolfGame;
 
 public class WolfController implements ActionListener {
@@ -40,6 +41,5 @@ public class WolfController implements ActionListener {
 		roundTicksLeft--;
 		frame.notifyTicks(roundTicksLeft, TICKS_PER_ROUND);
 	}
-	
 
 }

@@ -8,7 +8,8 @@ import uk.me.webpigeon.wolf.action.ActionI;
 public interface RoleI {
 	
 	public boolean isOnTeam(Team wolves);
-	Collection<ActionI> getLegalActions(GameState state, Collection<String> players);
+	Collection<ActionI> getLegalActions(String name, GameState state, Collection<String> players);
 	public Object getName();
+	public Team[] getTeams();
 
 }

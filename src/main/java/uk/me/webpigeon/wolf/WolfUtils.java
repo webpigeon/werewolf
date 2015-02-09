@@ -5,30 +5,33 @@ import java.util.List;
 
 public class WolfUtils {
 
-	public static GameObserver buildSmartPlayer(String name) {
-		return buildRunnablePlayer(new BasicIntelligencePlayer(name));
+	public static GameObserver buildSmartPlayer() {
+		return buildRunnablePlayer(new BasicIntelligencePlayer());
 	}
 	
-	public static GameObserver buildRandomPlayer(String name) {
-		return buildRunnablePlayer(new RandomPlayer(name));
+	public static GameObserver buildRandomPlayer() {
+		return buildRunnablePlayer(new RandomPlayer());
 	}
 	
-	public static GameObserver buildNoopPlayer(String name) {
-		return buildRunnablePlayer(new NoopPlayer(name));
+	public static GameObserver buildNoopPlayer() {
+		return buildRunnablePlayer(new NoopPlayer());
 	}
 	
 	public static GameObserver buildRunnablePlayer(AbstractPlayer p) {
 		Thread pThread = new Thread(p);
-		pThread.setName("player-"+p.getName().toLowerCase());
+		pThread.setName("player-thread-"+System.nanoTime());
 		pThread.start();
 		return p;
 	}
 	
 	public static List<RoleI> buildRoleList() {
 		RoleI wolf = new WolfRole();
-		RoleI villager = new AbstractRole("villager", Team.VILLAGERS);
 		
-		return Arrays.asList(wolf, villager, villager, villager, villager, villager, villager);
+		return Arrays.asList(wolf);
+	}
+
+	public static RoleI getDefaultRole() {
+		return new AbstractRole("villager", Team.VILLAGERS);
 	}
 	
 	

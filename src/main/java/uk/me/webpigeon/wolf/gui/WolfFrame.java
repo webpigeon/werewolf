@@ -1,7 +1,6 @@
 package uk.me.webpigeon.wolf.gui;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.Collection;
@@ -10,8 +9,9 @@ import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
@@ -19,11 +19,6 @@ import javax.swing.text.html.HTMLEditorKit;
 
 public class WolfFrame {
 	private JFrame frame;
-	private JPanel cards;
-	private JPanel dayScreen;
-	private JPanel nightScreen;
-	private JProgressBar progressBar;
-	private CardLayout layout;
 	private DefaultListModel<String> players;
 	private DefaultBoundedRangeModel progressBarModel;
 	
@@ -32,8 +27,6 @@ public class WolfFrame {
 	
 	public WolfFrame() {
 		frame = new JFrame();
-		dayScreen = new JPanel();
-		nightScreen = new JPanel();
 		initGUI();
 	}
 	
@@ -43,15 +36,12 @@ public class WolfFrame {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(800, 600));
 		
-		
 		progressBarModel = new DefaultBoundedRangeModel();
 		JProgressBar progressBar = new JProgressBar(progressBarModel);
 		frame.add(progressBar, BorderLayout.NORTH);
 		
 		players = new DefaultListModel<String>();
 		JList<String> playerList = new JList<String>(players);
-		frame.add(playerList, BorderLayout.WEST);
-		
 		
 		kit = new HTMLEditorKit();
 		document = (HTMLDocument)kit.createDefaultDocument();
@@ -61,7 +51,12 @@ public class WolfFrame {
 		console.setDocument(document);
 		
 		//console.setEditable(false);
-		frame.add(console, BorderLayout.CENTER);
+		
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, playerList, console);
+		splitPane.add(new JScrollPane(console));
+		splitPane.setResizeWeight(0.20);
+		
+		frame.add(splitPane, BorderLayout.CENTER);
 	}
 
 	public void setPlayers(Collection<String> alivePlayers) {
@@ -71,7 +66,7 @@ public class WolfFrame {
 		}
 	}
 	
-	public void apppendText(String text) {
+	public void appendText(String text) {
 		try {
 			kit.insertHTML(document, document.getLength(), text, 0, 0, null);
 		} catch (IOException | BadLocationException ex) {
@@ -88,5 +83,17 @@ public class WolfFrame {
 		progressBarModel.setMinimum(0);
 		progressBarModel.setMaximum(ticksPerRound);
 		progressBarModel.setValue(ticksPerRound - roundTicksLeft);
+	}
+	
+	public void printContext(String message) {
+		appendText("<i>["+message+"]</i>");
+	}
+	
+	public void printNarrative(String message) {
+		appendText("<i>"+message+"</i>");
+	}
+
+	public void printMessage(String player, String message) {
+		appendText("&lt;<b>"+player+"</b>&gt; "+message);
 	}
 }

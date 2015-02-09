@@ -48,4 +48,9 @@ public class ObserverController implements GameController {
 		//observers have no role
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 }

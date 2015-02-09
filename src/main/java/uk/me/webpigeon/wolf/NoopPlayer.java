@@ -6,9 +6,7 @@ import uk.me.webpigeon.wolf.action.ActionI;
 
 public class NoopPlayer extends AbstractPlayer {
 	
-	public NoopPlayer(String name) {
-		super(name);
-		
+	public NoopPlayer() {	
 	}
 
 	@Override

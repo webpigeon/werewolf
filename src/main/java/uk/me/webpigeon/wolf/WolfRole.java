@@ -15,14 +15,14 @@ public class WolfRole extends AbstractRole {
 	}
 
 	@Override
-	public Collection<ActionI> getLegalActions(GameState state, Collection<String> players) {
+	public Collection<ActionI> getLegalActions(String name, GameState state, Collection<String> players) {
 		
 		List<ActionI> actionList = new ArrayList<ActionI>();
-		actionList.addAll(super.getLegalActions(state, players));
+		actionList.addAll(super.getLegalActions(name, state, players));
 		
 		switch (state) {
 			case NIGHTTIME:
-				permuteEating(actionList, players);
+				permuteEating(name, actionList, players);
 				break;
 						
 			default:
@@ -31,9 +31,9 @@ public class WolfRole extends AbstractRole {
 		return actionList;
 	}
 
-	private Collection<ActionI> permuteEating(List<ActionI> legalActions, Collection<String> players) {	
+	private Collection<ActionI> permuteEating(String name, List<ActionI> legalActions, Collection<String> players) {	
 		legalActions.add(new AbstainAction());
-		permute(legalActions, players, EatAction.class);
+		permute(legalActions, name, players, EatAction.class);
 		return legalActions;
 	}
 

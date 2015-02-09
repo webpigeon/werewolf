@@ -9,8 +9,7 @@ import uk.me.webpigeon.wolf.action.ActionI;
 
 public class RandomPlayer extends AbstractPlayer {
 
-	public RandomPlayer(String name) {
-		super(name);
+	public RandomPlayer() {
 	}
 
 	@Override

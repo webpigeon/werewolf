@@ -1,16 +1,11 @@
 package uk.me.webpigeon.wolf;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
 
 import uk.me.webpigeon.wolf.action.ActionI;
-import uk.me.webpigeon.wolf.gui.WolfController;
-
 public abstract class AbstractPlayer implements GameObserver, Runnable {
 	private static final Integer MAX_THINK_DELTA = 500;
 	private static final Integer MIN_THINK_TIME = 5000;
@@ -19,16 +14,18 @@ public abstract class AbstractPlayer implements GameObserver, Runnable {
 	private String name;
 	protected Map<String, RoleI> roles;
 	protected GameController controller;
+	private boolean alive;
 	
-	public AbstractPlayer(String name) {
-		this.name = name;
+	public AbstractPlayer() {
 		this.roles = new TreeMap<String, RoleI>();
 		this.controller = null;
 		this.random = new Random();
+		this.alive = true;
 	}
 	
 	public void bind(GameController controller) {
 		this.controller = controller;
+		this.name = controller.getName();
 	}
 	
 	public RoleI getRole() {
@@ -71,7 +68,9 @@ public abstract class AbstractPlayer implements GameObserver, Runnable {
 
 	@Override
 	public void notifyDeath(String who, String how) {
-		
+		if (who.equals(name)) {
+			alive = false;
+		}
 	}
 	
 	@Override
@@ -82,11 +81,15 @@ public abstract class AbstractPlayer implements GameObserver, Runnable {
 	@Override
 	public void run() {
 		
-		while (!Thread.interrupted()) {
-			if (controller != null && (controller.getStage() == GameState.DAYTIME || controller.getStage() == GameState.NIGHTTIME)) {
-				takeAction(controller.getLegalActions());
-			} else {
-				think("skipping go");
+		while (!Thread.interrupted() && alive) {
+			if (controller != null) {
+				GameState state = controller.getStage();
+				if (state == GameState.DAYTIME || state == GameState.NIGHTTIME) {
+					takeAction(controller.getLegalActions());
+				} else if (state == GameState.GAMEOVER) {
+					think("The game is over");
+					alive = false;
+				}
 			}
 			
 			try{

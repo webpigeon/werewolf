@@ -2,6 +2,7 @@ package uk.me.webpigeon.wolf.gui;
 
 import java.util.List;
 
+import uk.me.webpigeon.wolf.BasicIntelligencePlayer;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.WolfGame;
 import uk.me.webpigeon.wolf.WolfUtils;
@@ -28,13 +29,13 @@ public class GraphicalWolf {
 		List<RoleI> roles = WolfUtils.buildRoleList();
 		WolfGame game = new WolfGame(roles);
 		
-		game.add(WolfUtils.buildRandomPlayer("Fred"));
-		game.add(WolfUtils.buildSmartPlayer("John"));
-		game.add(WolfUtils.buildSmartPlayer("Bob"));
-		game.add(WolfUtils.buildSmartPlayer("Wolfgang"));
-		game.add(WolfUtils.buildSmartPlayer("Pebbles"));
-		game.add(WolfUtils.buildSmartPlayer("Jackie"));
-		game.add(WolfUtils.buildSmartPlayer("Sarah"));
+		game.add("Fred", new BasicIntelligencePlayer());
+		game.add("John", new BasicIntelligencePlayer());
+		game.add("Bob", new BasicIntelligencePlayer());
+		game.add("Wolfgang", new BasicIntelligencePlayer());
+		game.add("Pebbles", new BasicIntelligencePlayer());
+		game.add("Jackie", new BasicIntelligencePlayer());
+		game.add("Sarah", new BasicIntelligencePlayer());
 		
 		return game;
 	}

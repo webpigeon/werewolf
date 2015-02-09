@@ -16,33 +16,33 @@ public class GraphicalObserver implements GameObserver {
 
 	@Override
 	public void notifyRole(String p, RoleI r) {
-		frame.apppendText("<i>["+p+" is now a <b>"+r.getName()+"</b>]</i>");
+		frame.appendText("<i>["+p+" is now a <b>"+r.getName()+"</b>]</i>");
 	}
 
 	@Override
 	public void notifyDaytime(PlayerController controller) {
 		wolfController.setRoundStarted(true);
-		frame.apppendText("It is now daytime");
-		frame.apppendText("Alive players are: "+controller.getPlayers());
+		frame.appendText("It is now daytime");
+		frame.appendText("Alive players are: "+controller.getPlayers());
 		frame.setPlayers(controller.getPlayers());
 	}
 
 	@Override
 	public void notifyNighttime(PlayerController controller) {
 		wolfController.setRoundStarted(false);
-		frame.apppendText("It is now nighttime");
-		frame.apppendText("Alive players are: "+controller.getPlayers());
+		frame.appendText("It is now nighttime");
+		frame.appendText("Alive players are: "+controller.getPlayers());
 		frame.setPlayers(controller.getPlayers());
 	}
 
 	@Override
 	public void notifyVote(String voter, String votee) {
-		frame.apppendText("[*] <b>"+voter+"</b> voted for <b>"+votee+"</b>");
+		frame.appendText("[*] <b>"+voter+"</b> voted for <b>"+votee+"</b>");
 	}
 
 	@Override
 	public synchronized void notifyMessage(String who, String message) {
-		frame.apppendText("&lt;<b>"+who+"</b>&gt; "+message);
+		frame.appendText("&lt;<b>"+who+"</b>&gt; "+message);
 	}
 
 	@Override
@@ -53,15 +53,15 @@ public class GraphicalObserver implements GameObserver {
 		
 		switch(cause) {
 			case "lynch":
-				frame.apppendText("[*] the villagers lynch "+name);
+				frame.appendText("[*] the villagers lynch "+name);
 				break;
 				
 			case "timeout":
-				frame.apppendText("[*] <b>"+name+"</b> suddenly falls down dead");
+				frame.appendText("[*] <b>"+name+"</b> suddenly falls down dead");
 				break;
 				
 			case "eaten":
-				frame.apppendText("[*] <b>"+name+"</b> was eaten by wolves");
+				frame.appendText("[*] <b>"+name+"</b> was eaten by wolves");
 				break;
 		}
 	}

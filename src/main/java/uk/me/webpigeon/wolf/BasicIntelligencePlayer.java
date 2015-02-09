@@ -10,8 +10,7 @@ import uk.me.webpigeon.wolf.action.ActionI;
 public class BasicIntelligencePlayer extends AbstractPlayer {
 	private Map<String, Integer> baises;
 	
-	public BasicIntelligencePlayer(String name) {
-		super(name);
+	public BasicIntelligencePlayer() {
 		this.baises = new TreeMap<String, Integer>();
 	}
 	

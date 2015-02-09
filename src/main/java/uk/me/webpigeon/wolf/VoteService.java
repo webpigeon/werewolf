@@ -39,7 +39,7 @@ public class VoteService <T> {
 		return voteTotal==null?0:voteTotal;
 	}
 
-	public synchronized boolean isFinished() {
+	public synchronized boolean isFinished() {		
 		return votes.size() == voteTokens.size() || suddenDeath;
 	}
 

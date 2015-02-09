@@ -13,6 +13,8 @@ public interface GameController {
 	
 	public GameState getStage();
 	public List<String> getAlivePlayers();
+	
+	public String getName();
 	public void setState(GameState newState);
 	public void setRole(RoleI role);
 
