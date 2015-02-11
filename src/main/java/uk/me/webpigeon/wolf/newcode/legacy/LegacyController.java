@@ -29,7 +29,7 @@ public class LegacyController implements GameController {
 	
 	@Override
 	public void talk(String message) {
-		controller.addTask(new TalkAction(playerName, message));
+		controller.addTask(playerName, new TalkAction(playerName, message));
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class LegacyController implements GameController {
 
 	@Override
 	public void act(ActionI action) {
-		controller.addTask(action);
+		controller.addTask(playerName, action);
 	}
 
 	@Override

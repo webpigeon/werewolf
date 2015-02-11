@@ -15,7 +15,7 @@ public abstract class NewAction implements ActionI {
 	}
 	
 	@Override
-	public void execute(WolfController controller, WolfModel model) {
+	public void execute(String name, WolfController controller, WolfModel model) {
 		if (!isPermittedState(controller.getState())){
 			throw new RuntimeException("user attempted illegal move");
 		}

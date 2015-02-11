@@ -7,9 +7,8 @@ import uk.me.webpigeon.wolf.newcode.WolfModel;
 public class EndGame extends NewAction {
 
 	@Override
-	public void execute(WolfController controller, WolfModel model) {
+	public void execute(String name, WolfController controller, WolfModel model) {
 		controller.setState(GameState.GAMEOVER);
-		controller.announceState(GameState.GAMEOVER);
 	}
 
 	@Override

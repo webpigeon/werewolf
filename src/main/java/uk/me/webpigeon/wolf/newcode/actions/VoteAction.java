@@ -4,17 +4,16 @@ import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.VoteService;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
+import uk.me.webpigeon.wolf.newcode.events.PlayerVote;
 
 public abstract class VoteAction extends NewAction {
 	
 	private String voteVerb;
-	protected final String name;
 	private String candidate;
 	private boolean publicVote;
 	
 	public VoteAction(String candidate, boolean publicVote) {
 		super(GameState.DAYTIME, GameState.NIGHTTIME);
-		this.name = null;
 		this.voteVerb = "vote for";
 		this.candidate = candidate;
 		this.publicVote = publicVote;
@@ -22,39 +21,29 @@ public abstract class VoteAction extends NewAction {
 	
 	public VoteAction(String verb, String candidate, boolean publicVote) {
 		super(GameState.DAYTIME, GameState.NIGHTTIME);
-		this.name = null;
 		this.voteVerb = verb;
-		this.candidate = candidate;
-		this.publicVote = publicVote;
-	}
-	
-	
-	public VoteAction(String verb, String voter, String candidate, boolean publicVote) {
-		super(GameState.DAYTIME, GameState.NIGHTTIME);
-		this.voteVerb = verb;
-		this.name = voter;
 		this.candidate = candidate;
 		this.publicVote = publicVote;
 	}
 	
 	@Override
 	public String toString() {
-		return name+" "+voteVerb+" "+candidate;
+		return voteVerb+" "+candidate;
 	}
 	
-	protected abstract boolean isValid(WolfController controller, WolfModel model);
+	protected abstract boolean isValid(String name, WolfController controller, WolfModel model);
 
 	@Override
-	public void execute(WolfController controller, WolfModel model) {
-		super.execute(controller, model);
+	public void execute(String name, WolfController controller, WolfModel model) {
+		super.execute(name, controller, model);
 		
-		if (isValid(controller, model)) {
+		if (isValid(name, controller, model)) {
 			VoteService<String> service = controller.getVoteService();
 			if (service != null) {
 				service.vote(name, candidate);
 				
 				if (publicVote) {
-					controller.announceVote(name, candidate);
+					controller.broadcast(new PlayerVote(name, candidate));
 				}
 				
 				/*if (service.isFinished()) {
@@ -70,7 +59,6 @@ public abstract class VoteAction extends NewAction {
 		int result = 1;
 		result = prime * result
 				+ ((candidate == null) ? 0 : candidate.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + (publicVote ? 1231 : 1237);
 		result = prime * result
 				+ ((voteVerb == null) ? 0 : voteVerb.hashCode());
@@ -85,7 +73,7 @@ public abstract class VoteAction extends NewAction {
 		
 		try {
 			VoteAction other = (VoteAction)obj;
-			return voteVerb.equals(other.voteVerb) && candidate.equals(other.candidate) && name.equals(other.name);
+			return voteVerb.equals(other.voteVerb) && candidate.equals(other.candidate);
 		} catch (ClassCastException ex) {
 			return false;
 		}
@@ -99,7 +87,7 @@ public abstract class VoteAction extends NewAction {
 		
 		try {
 			VoteAction other = (VoteAction)action;
-			return voteVerb.equals(other.voteVerb) && candidate.equals(other.candidate) && name.equals(other.name);
+			return voteVerb.equals(other.voteVerb) && candidate.equals(other.candidate);
 		} catch (ClassCastException ex) {
 			return false;
 		}

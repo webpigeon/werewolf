@@ -36,7 +36,7 @@ public class AbstractRole implements RoleI {
 	
 	protected Collection<ActionI> permuteLynching(String name, Collection<String> players) {
 		List<ActionI> lynchList = new ArrayList<ActionI>(players.size());
-		lynchList.add(new AbstainAction(name));
+		lynchList.add(new AbstainAction());
 		permute(lynchList, name, players, LynchAction.class);
 		return lynchList;
 	}
@@ -52,10 +52,10 @@ public class AbstractRole implements RoleI {
 	 */
 	protected Collection<ActionI> permute(Collection<ActionI> actionList, String name, Collection<String> players, Class<? extends ActionI> actionClass) {
 		try {
-			Constructor<? extends ActionI> con = actionClass.getConstructor(String.class, String.class);
+			Constructor<? extends ActionI> con = actionClass.getConstructor(String.class);
 			
 			for (String player : players) {
-				actionList.add(con.newInstance(name, player));
+				actionList.add(con.newInstance(player));
 			}
 			
 			return actionList;

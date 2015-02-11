@@ -8,6 +8,7 @@ import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.VoteService;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
+import uk.me.webpigeon.wolf.newcode.events.PlayerDeath;
 
 /**
  * Action to advance the current turn to the next game phase.
@@ -19,7 +20,7 @@ public class AdvanceTurn extends NewAction {
 	}
 	
 	@Override
-	public void execute(WolfController controller, WolfModel model) {
+	public void execute(String name, WolfController controller, WolfModel model) {
 		GameState currentState = controller.getState();
 		if (!isPermittedState(currentState)) {
 			System.err.println("tried to advance turn when not in main game stage");
@@ -45,11 +46,11 @@ public class AdvanceTurn extends NewAction {
 			model.removePlayer(victim);
 			
 			// Step 3. tell people who died
-			controller.announceDeath(victim, victimRole, currentState==GameState.DAYTIME?"lynch":"eat");
-			controller.announceRole(victim, victimRole);
+			String cause = currentState==GameState.DAYTIME?"lynch":"eat";
+			controller.broadcast(new PlayerDeath(victim, victimRole.getName(), cause));
 			
 			if (model.isGameOver()) {
-				controller.addTask(new EndGame());
+				controller.addTask(null, new EndGame());
 				return;
 			}
 		}
@@ -63,8 +64,6 @@ public class AdvanceTurn extends NewAction {
 		
 		// tell the controller it's now tomorrow
 		controller.setState(newState);
-		controller.announceState(newState);
-		
 	}
 
 	@Override

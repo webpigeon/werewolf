@@ -1,23 +1,23 @@
 package uk.me.webpigeon.wolf.newcode.actions;
 
 import uk.me.webpigeon.wolf.RoleI;
+import uk.me.webpigeon.wolf.SeerRole;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
+import uk.me.webpigeon.wolf.newcode.events.PlayerRole;
 
 public class SeeAction implements ActionI {
 	
-	private String seer;
 	private String seen;
 	
-	public SeeAction(String seer, String seen) {
-		this.seer = seer;
+	public SeeAction(String seen) {
 		this.seen = seen;
 	}
 
 	@Override
-	public void execute(WolfController controller, WolfModel model) {
+	public void execute(String name, WolfController controller, WolfModel model) {
 		RoleI seenRole = model.getRole(seen);
-		controller.sendRole(seer, seen, seenRole);
+		controller.unicast(name, new PlayerRole(seen, seenRole));
 	}
 	
 	public String toString() {
@@ -29,7 +29,6 @@ public class SeeAction implements ActionI {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((seen == null) ? 0 : seen.hashCode());
-		result = prime * result + ((seer == null) ? 0 : seer.hashCode());
 		return result;
 	}
 
@@ -46,11 +45,6 @@ public class SeeAction implements ActionI {
 			if (other.seen != null)
 				return false;
 		} else if (!seen.equals(other.seen))
-			return false;
-		if (seer == null) {
-			if (other.seer != null)
-				return false;
-		} else if (!seer.equals(other.seer))
 			return false;
 		return true;
 	}

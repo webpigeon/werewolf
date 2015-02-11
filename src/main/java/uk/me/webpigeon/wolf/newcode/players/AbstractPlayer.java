@@ -7,6 +7,7 @@ import java.util.concurrent.BlockingQueue;
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.EventI;
 
@@ -16,7 +17,7 @@ import uk.me.webpigeon.wolf.newcode.events.EventI;
 public abstract class AbstractPlayer implements Runnable, SessionManager {
 	
 	private String name;
-	private Queue<ActionI> actionQueue;
+	private WolfController controller;
 	private BlockingQueue<EventI> eventQueue;
 	private GameState state;
 	private BeliefSystem system;
@@ -27,9 +28,9 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 	}
 
 	@Override
-	public void bind(String name, Queue<ActionI> actionQueue, BlockingQueue<EventI> eventQueue) {		
+	public void bind(String name, WolfController controller, BlockingQueue<EventI> eventQueue) {		
 		this.name = name;
-		this.actionQueue = actionQueue;
+		this.controller = controller;
 		this.eventQueue = eventQueue;
 	}
 	
@@ -51,7 +52,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 			
 			ActionI action = selectAction(system);
 			if (action != null && !action.equals(currentAction)) {
-				actionQueue.add(action);
+				controller.addTask(name, action);
 				currentAction = action;
 			}
 		}

@@ -55,6 +55,11 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			voterBias = 0;
 		}
 		
+		//if they abstained, votee is null
+		if (votee == null) {
+			return;
+		}
+		
 		//if they vote for me I don't like them
 		if (votee.equals(getName())) {
 			baises.put(voter, voterBias+1);
@@ -113,7 +118,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		
 		// if it's night time and we're a villager, the only thing we can do is sleep
 		if (state == GameState.NIGHTTIME && "villager".equals(myRole)) {
-			takeAction(new AbstainAction(getName()));
+			takeAction(new AbstainAction());
 			return;
 		}
 		
@@ -122,7 +127,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			List<String> players = controller.getAlivePlayers();
 			String selected = selectPlayer(getScores(players, myRole, state), players, state);
 			
-			takeAction(new EatAction(getName(), selected));
+			takeAction(new EatAction(selected));
 			return;
 		}
 		
@@ -135,7 +140,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			List<String> players = controller.getAlivePlayers();
 			String selected = selectPlayer(getScores(players, myRole, state), players, state);
 			
-			takeAction(new SeeAction(getName(), selected));
+			takeAction(new SeeAction(selected));
 			return;
 		}
 		
@@ -144,7 +149,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			List<String> players = controller.getAlivePlayers();
 			String selected = selectPlayer(getScores(players, myRole, state), players, state);
 			
-			takeAction(new LynchAction(getName(), selected));
+			takeAction(new LynchAction(selected));
 			return;
 		}	
 

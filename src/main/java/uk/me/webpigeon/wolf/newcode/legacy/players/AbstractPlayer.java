@@ -14,7 +14,7 @@ import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.PlayerController;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
-public abstract class AbstractPlayer implements ActionListener, GameObserver {
+public abstract class AbstractPlayer implements GameObserver {
 	private String name;
 	protected RoleI myRole;
 	protected Map<String, String> roles;
@@ -82,11 +82,6 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver {
 	@Override
 	public void notifyMessage(String who, String what) {
 		
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		triggerAction();
 	}
 	
 	@Override

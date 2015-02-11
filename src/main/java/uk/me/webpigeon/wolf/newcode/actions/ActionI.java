@@ -5,7 +5,7 @@ import uk.me.webpigeon.wolf.newcode.WolfModel;
 
 public interface ActionI {
 	
-	public void execute(WolfController controller, WolfModel model);
+	public void execute(String user, WolfController controller, WolfModel model);
 	public boolean isEqual(ActionI action);
 
 }

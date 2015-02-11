@@ -16,7 +16,7 @@ public class TimeoutTask implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		controller.addTask(new AdvanceTurn());
+		controller.addTask(null, new AdvanceTurn());
 	}
 
 }

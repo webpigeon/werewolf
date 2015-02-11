@@ -8,12 +8,12 @@ import uk.me.webpigeon.wolf.newcode.WolfModel;
 
 public class EatAction extends VoteAction {
 
-	public EatAction(String name, String candidate) {
-		super("eat", name, candidate, false);
+	public EatAction(String candidate) {
+		super("eat", candidate, false);
 	}
 
 	@Override
-	protected boolean isValid(WolfController controller, WolfModel model) {
+	protected boolean isValid(String name, WolfController controller, WolfModel model) {
 		GameState state = controller.getState();
 		if (state != GameState.NIGHTTIME) {
 			return false;

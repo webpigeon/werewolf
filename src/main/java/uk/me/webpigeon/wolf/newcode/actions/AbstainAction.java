@@ -2,19 +2,16 @@ package uk.me.webpigeon.wolf.newcode.actions;
 
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
+import uk.me.webpigeon.wolf.newcode.events.PlayerVote;
 
 public class AbstainAction implements ActionI {
-	private String name;
-	
-	public AbstainAction(String name) {
-		this.name = name;
-	}
 
 	@Override
-	public void execute(WolfController controller, WolfModel model) {
+	public void execute(String name, WolfController controller, WolfModel model) {
 		//VoteService service = controller.getVoteService();
 		//service.vote(voter, null);
-		controller.announceVote(name, null);
+		
+		controller.broadcast(new PlayerVote(name, null));
 	}
 	
 	public boolean equals(Object other) {
@@ -26,6 +23,8 @@ public class AbstainAction implements ActionI {
 		return (action != null) && action instanceof AbstainAction;
 	}
 	
-	
+	public String toString(){
+		return "abstain";
+	}
 
 }

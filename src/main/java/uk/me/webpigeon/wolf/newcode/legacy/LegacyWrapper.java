@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.*;
 import uk.me.webpigeon.wolf.newcode.legacy.players.GameObserver;
@@ -14,7 +15,7 @@ public class LegacyWrapper implements Runnable, SessionManager {
 	private LegacyController c;
 	private Thread t;
 	
-	private Queue<ActionI> actionQueue;
+	private WolfController controller;
 	private BlockingQueue<EventI> eventQueue;
 	
 	public LegacyWrapper(GameObserver player, LegacyController c) {
@@ -80,8 +81,8 @@ public class LegacyWrapper implements Runnable, SessionManager {
 	}
 
 	@Override
-	public void bind(String name, Queue<ActionI> actionQueue, BlockingQueue<EventI> eventQueue) {
-		this.actionQueue = actionQueue;
+	public void bind(String name, WolfController controller, BlockingQueue<EventI> eventQueue) {
+		this.controller = controller;
 		this.eventQueue = eventQueue;
 		
 		c.setName(name);

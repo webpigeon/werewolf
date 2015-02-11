@@ -33,7 +33,7 @@ public class SeerRole extends AbstractRole {
 	}
 
 	private Collection<ActionI> permuteSeeing(String name, List<ActionI> legalActions, Collection<String> players) {	
-		legalActions.add(new AbstainAction(name));
+		legalActions.add(new AbstainAction());
 		permute(legalActions, name, players, SeeAction.class);
 		return legalActions;
 	}

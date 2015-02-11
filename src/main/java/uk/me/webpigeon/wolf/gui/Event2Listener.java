@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import uk.me.webpigeon.wolf.newcode.GameListener;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.ChatMessage;
 import uk.me.webpigeon.wolf.newcode.events.EventI;
@@ -80,7 +81,7 @@ public class Event2Listener implements Runnable, SessionManager {
 	}
 
 	@Override
-	public void bind(String name, Queue<ActionI> actionQueue, BlockingQueue<EventI> eventQueue) {
+	public void bind(String name, WolfController controller, BlockingQueue<EventI> eventQueue) {
 		this.eventQueue = eventQueue;
 		new Thread(this).start();
 	}

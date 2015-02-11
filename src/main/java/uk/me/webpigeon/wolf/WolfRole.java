@@ -32,7 +32,7 @@ public class WolfRole extends AbstractRole {
 	}
 
 	private Collection<ActionI> permuteEating(String name, List<ActionI> legalActions, Collection<String> players) {	
-		legalActions.add(new AbstainAction(name));
+		legalActions.add(new AbstainAction());
 		permute(legalActions, name, players, EatAction.class);
 		return legalActions;
 	}

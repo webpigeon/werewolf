@@ -11,6 +11,6 @@ import uk.me.webpigeon.wolf.newcode.events.EventI;
 
 public interface SessionManager {
 
-	void bind(String name, Queue<ActionI> actionQueue, BlockingQueue<EventI> eventQueue);
+	void bind(String name, WolfController wolfController, BlockingQueue<EventI> eventQueue);
 
 }

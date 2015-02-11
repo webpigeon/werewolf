@@ -15,6 +15,10 @@ import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 public class CraftyWolfPlayer extends BasicIntelligencePlayer {
 	
 	public void notifyVote(String voter, String votee) {		
+		if (votee == null) {
+			return;
+		}
+		
 		//if they vote for me I don't like them
 		if (votee.equals(getName())) {
 			recordBias(voter, 1);

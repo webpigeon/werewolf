@@ -32,7 +32,7 @@ public class WolfController implements Runnable {
 	
 	private Collection<Queue<EventI>> events;
 	private Map<String, Queue<EventI>> playerEvents;
-	private BlockingQueue<ActionI> actions;
+	private BlockingQueue<ActionWrapper> actions;
 
 	public WolfController(WolfModel model) {
 		this.model = model;
@@ -42,7 +42,7 @@ public class WolfController implements Runnable {
 		this.events = new ArrayList<>();
 		this.playerEvents = new TreeMap<>();
 		
-		this.actions = new LinkedBlockingQueue<ActionI>();
+		this.actions = new LinkedBlockingQueue<ActionWrapper>();
 	}
 	
 	public void setVoteService(VoteService<String> service) {
@@ -75,7 +75,7 @@ public class WolfController implements Runnable {
 		events.add(playerEventQueue);
 		playerEvents.put(name, playerEventQueue);
 		
-		listener.bind(name, actions, playerEventQueue);
+		listener.bind(name, this, playerEventQueue);
 	}
 	
 	public void startGame() {
@@ -92,7 +92,7 @@ public class WolfController implements Runnable {
 			unicast(player, new PlayerRole(player, role));
 		}
 		
-		actions.add(new StartGame());
+		addTask(new StartGame());
 	}
 	
 	public void unicast(String player, EventI event) {
@@ -115,22 +115,22 @@ public class WolfController implements Runnable {
 		
 		
 		System.out.println("[debug] Game started");
-		ActionI action = null;
+		ActionWrapper wrapper = null;
 		do {
 			System.out.println("\t"+actions);
 			
-			if (action != null) {
-				action.execute(this, model);
+			if (wrapper != null) {
+				wrapper.action.execute(wrapper.player, this, model);
 			}
 			
 			try {
-				action = actions.take();
+				wrapper = actions.take();
 			} catch (InterruptedException ex) {
 				System.err.println("interrupted!");
-				action = null;
+				wrapper = null;
 			}
 			
-		} while (action != null && !Thread.interrupted());
+		} while (wrapper != null && !Thread.interrupted());
 		
 		System.out.println("[debug] Game had ended");
 	}
@@ -141,13 +141,26 @@ public class WolfController implements Runnable {
 
 	public void setState(GameState newState) {
 		this.state = newState;
+		broadcast(new StateChanged(state));
 	}
 	
-	public void addTask(ActionI task) {
-		actions.add(task);
+	private void addTask(ActionI task) {
+		ActionWrapper wrapper = new ActionWrapper();
+		wrapper.player = null;
+		wrapper.action = task;
+		
+		actions.add(wrapper);
+	}
+	
+	public void addTask(String player, ActionI task) {
+		ActionWrapper wrapper = new ActionWrapper();
+		wrapper.player = player;
+		wrapper.action = task;
+		
+		actions.add(wrapper);
 	}
 
-	public void announceStart() {
+	/*public void announceStart() {
 		Collection<String> playerList = model.getPlayers();
 		broadcast(new GameStarted(playerList));
 	}
@@ -178,6 +191,14 @@ public class WolfController implements Runnable {
 		assert model.isAlivePlayer(seer);
 		
 		unicast(seer, new PlayerRole(seen, seenRole));
-	}
+	}*/
 
+	private static class ActionWrapper{
+		String player;
+		ActionI action;
+		
+		public String toString() {
+			return "("+player+","+action+")";
+		}
+	}
 }
