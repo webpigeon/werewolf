@@ -36,7 +36,7 @@ public class AbstractRole implements RoleI {
 	
 	protected Collection<ActionI> permuteLynching(String name, Collection<String> players) {
 		List<ActionI> lynchList = new ArrayList<ActionI>(players.size());
-		lynchList.add(new AbstainAction());
+		lynchList.add(new AbstainAction(name));
 		permute(lynchList, name, players, LynchAction.class);
 		return lynchList;
 	}

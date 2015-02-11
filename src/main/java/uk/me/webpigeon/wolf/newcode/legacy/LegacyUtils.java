@@ -27,7 +27,7 @@ public class LegacyUtils {
 	
 	public static SessionManager buildRandomPlayer(WolfController controller, WolfModel model) {
 		
-		GameObserver oldPlayer = WolfUtils.buildSmartPlayer();
+		GameObserver oldPlayer = WolfUtils.buildRandomPlayer();
 		LegacyController playerController = new LegacyController(controller, model);
 		return new LegacyWrapper(oldPlayer, playerController);
 		

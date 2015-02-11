@@ -39,7 +39,7 @@ public abstract class VoteAction extends NewAction {
 	
 	@Override
 	public String toString() {
-		return voteVerb+" "+candidate;
+		return name+" "+voteVerb+" "+candidate;
 	}
 	
 	protected abstract boolean isValid(WolfController controller, WolfModel model);
@@ -85,6 +85,20 @@ public abstract class VoteAction extends NewAction {
 		
 		try {
 			VoteAction other = (VoteAction)obj;
+			return voteVerb.equals(other.voteVerb) && candidate.equals(other.candidate) && name.equals(other.name);
+		} catch (ClassCastException ex) {
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean isEqual(ActionI action) {
+		if (action == null) {
+			return false;
+		}
+		
+		try {
+			VoteAction other = (VoteAction)action;
 			return voteVerb.equals(other.voteVerb) && candidate.equals(other.candidate) && name.equals(other.name);
 		} catch (ClassCastException ex) {
 			return false;

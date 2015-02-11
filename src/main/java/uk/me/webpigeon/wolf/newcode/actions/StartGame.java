@@ -28,5 +28,10 @@ public class StartGame extends NewAction {
 		controller.announceState(GameState.DAYTIME);
 	}
 
+	@Override
+	public boolean isEqual(ActionI action) {
+		return false;
+	}
+
 
 }

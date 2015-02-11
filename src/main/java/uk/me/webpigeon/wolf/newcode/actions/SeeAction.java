@@ -15,14 +15,8 @@ public class SeeAction implements ActionI {
 	}
 
 	@Override
-	public boolean isTarget(String selected) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public void execute(WolfController controller, WolfModel model) {
-		RoleI seenRole = model.getRole(seer);
+		RoleI seenRole = model.getRole(seen);
 		controller.sendRole(seer, seen, seenRole);
 	}
 	
@@ -59,6 +53,12 @@ public class SeeAction implements ActionI {
 		} else if (!seer.equals(other.seer))
 			return false;
 		return true;
+	}
+
+	@Override
+	public boolean isEqual(ActionI action) {
+		SeeAction seeAction = (SeeAction)action;
+		return seen.equals(seeAction.seen);
 	}
 	
 }

@@ -12,5 +12,10 @@ public class EndGame extends NewAction {
 		controller.announceState(GameState.GAMEOVER);
 	}
 
+	@Override
+	public boolean isEqual(ActionI action) {
+		return false;
+	}
+
 
 }

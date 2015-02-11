@@ -17,7 +17,7 @@ public class AdvanceTurn extends NewAction {
 	public AdvanceTurn() {
 		super(GameState.DAYTIME, GameState.NIGHTTIME);
 	}
-
+	
 	@Override
 	public void execute(WolfController controller, WolfModel model) {
 		GameState currentState = controller.getState();
@@ -67,5 +67,9 @@ public class AdvanceTurn extends NewAction {
 		
 	}
 
-
+	@Override
+	public boolean isEqual(ActionI action) {
+		return (action != null) && action instanceof AdvanceTurn;
+	}
+	
 }

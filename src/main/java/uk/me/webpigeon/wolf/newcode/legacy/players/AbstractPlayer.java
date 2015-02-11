@@ -61,11 +61,11 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver {
 		}
 		
 		roles.put(player, role.getName());
-		think("I think that "+player+" is a "+role);
+		//think("I think that "+player+" is a "+role);
 	}
 	
 	protected void think(String thought) {
-		//System.out.println("*"+name+"* "+thought);
+		System.out.println("*"+name+"* "+thought);
 	}
 
 	@Override

@@ -113,7 +113,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		
 		// if it's night time and we're a villager, the only thing we can do is sleep
 		if (state == GameState.NIGHTTIME && "villager".equals(myRole)) {
-			takeAction(new AbstainAction());
+			takeAction(new AbstainAction(getName()));
 			return;
 		}
 		
@@ -128,6 +128,10 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		
 		// if it's night time and we're the seer, we see someone
 		if (state == GameState.NIGHTTIME && "seer".equals(myRole)) {
+			if (currentAction != null) {
+				return;
+			}
+			
 			List<String> players = controller.getAlivePlayers();
 			String selected = selectPlayer(getScores(players, myRole, state), players, state);
 			
@@ -149,10 +153,13 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 	protected void takeAction(ActionI action) {
 		if (action.equals(currentAction)) {
 			return;
+		} else {
+			if (currentAction != null) {
+				think("I changed my mind from "+currentAction+" to "+action+" "+controller.getStage());
+			}
+			controller.act(action);
+			currentAction = action;
 		}
-		
-		controller.act(action);
-		currentAction = action;
 	}
 	
 	public void shareInfomation(String node, String prop, String subject) {
@@ -258,6 +265,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 
 	@Override
 	protected void clearTurnLocks() {
+		System.out.println(getName()+" cleaned current action "+controller.getStage());
 		currentAction = null;
 	}
 	

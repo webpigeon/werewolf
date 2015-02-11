@@ -31,9 +31,4 @@ public abstract class NewAction implements ActionI {
 		return permittedStates.contains(current);
 	}
 
-	@Override
-	public final boolean isTarget(String selected) {
-		throw new RuntimeException("Incompatable action: new actions are only for new games");
-	}
-
 }

@@ -22,5 +22,10 @@ public class TalkAction extends NewAction {
 	public String toString() {
 		return "talk("+player+","+message+")";
 	}
+
+	@Override
+	public boolean isEqual(ActionI action) {
+		return false;
+	}
 	
 }

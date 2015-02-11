@@ -117,7 +117,7 @@ public class WolfController implements Runnable {
 		System.out.println("[debug] Game started");
 		ActionI action = null;
 		do {
-			//System.out.println("\t"+actions);
+			System.out.println("\t"+actions);
 			
 			if (action != null) {
 				action.execute(this, model);
