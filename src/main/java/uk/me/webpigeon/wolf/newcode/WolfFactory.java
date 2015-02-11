@@ -1,6 +1,9 @@
 package uk.me.webpigeon.wolf.newcode;
 
 import uk.me.webpigeon.wolf.newcode.legacy.LegacyUtils;
+import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
+import uk.me.webpigeon.wolf.newcode.players.behavours.BehavourPlayer;
+import uk.me.webpigeon.wolf.newcode.players.behavours.RandomUnsafeLynch;
 
 public class WolfFactory {
 	
@@ -20,7 +23,19 @@ public class WolfFactory {
 		controller.addPlayer("Jackie", LegacyUtils.buildSmartPlayer(controller, model));
 		controller.addPlayer("Sarah", LegacyUtils.buildSmartPlayer(controller, model));
 		
+		controller.addPlayer("Rawr", buildBehavourPlayer());
+		
 		return controller;
+	}
+	
+	public static GameListener buildBehavourPlayer() {
+		BehavourPlayer player = new BehavourPlayer();
+		player.addBehavour(new RandomUnsafeLynch());
+		
+		Thread t = new Thread(player);
+		t.start();
+		
+		return player;
 	}
 
 }

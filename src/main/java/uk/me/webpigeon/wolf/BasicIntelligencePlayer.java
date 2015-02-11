@@ -23,6 +23,22 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		sharedInfomation = new HashSet<String>();
 	}
 	
+	public void recordBias(String player, int biasDelta) {
+		Integer voterBias = baises.get(player);
+		if (voterBias == null) {
+			voterBias = 0;
+		}
+		baises.put(player, voterBias + biasDelta);
+	}
+	
+	public int getBias(String player) {
+		Integer voterBias = baises.get(player);
+		if (voterBias == null) {
+			voterBias = 0;
+		}
+		return voterBias;
+	}
+	
 	public void notifyVote(String voter, String votee) {
 		Integer voterBias = baises.get(voter);
 		if (voterBias == null) {

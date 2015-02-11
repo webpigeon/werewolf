@@ -13,23 +13,16 @@ import uk.me.webpigeon.wolf.action.ActionI;
 
 public class CraftyWolfPlayer extends BasicIntelligencePlayer {
 	private Pattern messageRegex;
-	private Map<String, Integer> baises;
 	private ActionI currentAction;
 	
 	public CraftyWolfPlayer() {
-		baises = new TreeMap<String, Integer>();
 		messageRegex = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
 	}
 	
-	public void notifyVote(String voter, String votee) {
-		Integer voterBias = baises.get(voter);
-		if (voterBias == null) {
-			voterBias = 0;
-		}
-		
+	public void notifyVote(String voter, String votee) {		
 		//if they vote for me I don't like them
 		if (votee.equals(getName())) {
-			baises.put(voter, voterBias+1);
+			recordBias(voter, 1);
 			
 			// if someone votes for me then pretend to be the seer
 			if ("wolf".equals(getRole())) {
@@ -55,10 +48,10 @@ public class CraftyWolfPlayer extends BasicIntelligencePlayer {
 		if (voteeRole != null) {
 			if ("wolf".equals(voteeRole)) {
 				// the person voted for the wolf
-				baises.put(voter, voterBias-1);
+				recordBias(voter, -1);
 			} else if ("seer".equals(voteeRole)) {
 				// if they vote for the seer, They're probably a moron or the wolf
-				baises.put(voter, voterBias+10);
+				recordBias(voter, 10);
 			}
 		}
 	}
