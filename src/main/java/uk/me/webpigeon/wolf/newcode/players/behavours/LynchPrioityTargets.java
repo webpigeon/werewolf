@@ -11,36 +11,51 @@ import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 /**
  * Vote for a random player we know not to be a "safe" role
  */
-public class RandomUnsafeLynch implements Behavour {
-	private static final String[] UNSAFE_ROLES = {"villager"};
+public class LynchPrioityTargets implements Behavour {
+	private static final String[] UNSAFE_ROLES = {"wolf"};
 	private Random random;
 	
-	public RandomUnsafeLynch() {
+	public LynchPrioityTargets() {
 		this.random = new Random();
 	}
 
 	@Override
 	public boolean canActivate(BeliefSystem myPlayer, ActionI a) {
-		return a == null;
+		
+		List<String> targets = new ArrayList<String>();
+		for (String player : myPlayer.getPlayers()) {
+			String role = myPlayer.getRole(player);
+			if (isTarget(role)) {
+				targets.add(player);
+			}
+		}
+		
+		if (a != null && a instanceof LynchAction) {
+			LynchAction act = (LynchAction)a;
+			if (targets.contains(act.getTarget())) {
+				return false;
+			}
+		}
+		
+		return !targets.isEmpty();
 	}
 
 	@Override
 	public ActionI generateAction(BeliefSystem myPlayer) {
 		
-		List<String> unsafePlayers = new ArrayList<String>();
-		for (String player : myPlayer.getPlayers() ) {
+		List<String> targets = new ArrayList<String>();
+		for (String player : myPlayer.getPlayers()) {
 			String role = myPlayer.getRole(player);
-			
-			if (isUnsafe(role)) {
-				unsafePlayers.add(player);
+			if (isTarget(role)) {
+				targets.add(player);
 			}
 		}
 		
-		if (unsafePlayers.isEmpty()) {
+		if (targets.isEmpty()) {
 			return null;
 		}
 		
-		String choice = unsafePlayers.get(random.nextInt(unsafePlayers.size()));
+		String choice = targets.get(random.nextInt(targets.size()));
 		return new LynchAction(choice);
 	}
 	
@@ -50,7 +65,7 @@ public class RandomUnsafeLynch implements Behavour {
 	 * @param role the role we are checking
 	 * @return true if the role is unsafe, false otherwise
 	 */
-	private boolean isUnsafe(String role) {
+	private boolean isTarget(String role) {
 		if (role == null) {
 			return true;
 		}

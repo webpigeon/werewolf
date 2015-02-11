@@ -10,6 +10,9 @@ import uk.me.webpigeon.wolf.newcode.SessionManager;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.EventI;
+import uk.me.webpigeon.wolf.newcode.events.GameStarted;
+import uk.me.webpigeon.wolf.newcode.events.PlayerVote;
+import uk.me.webpigeon.wolf.newcode.events.StateChanged;
 
 /**
  * A basis for players based around the new game engine.
@@ -21,7 +24,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 	private BlockingQueue<EventI> eventQueue;
 	private GameState state;
 	private BeliefSystem system;
-	private ActionI currentAction;
+	protected ActionI currentAction;
 	
 	public AbstractPlayer() {
 		this.system = new BeliefSystem();
@@ -42,14 +45,12 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 			
 			try {
 				EventI event = eventQueue.take();
-				//TODO parse events
-				
+				processEvent(event);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
+				
 			ActionI action = selectAction(system);
 			if (action != null && !action.equals(currentAction)) {
 				controller.addTask(name, action);
@@ -57,6 +58,27 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 			}
 		}
 		
+	}
+	
+	private void processEvent(EventI event) {
+		switch(event.getType()) {
+			case "gameStarted":
+				GameStarted gs = (GameStarted)event;
+				system.setPlayers(gs.players);
+				break;
+				
+			case "stateChange":
+				StateChanged sc = (StateChanged)event;
+				state = sc.newState;
+				break;
+				
+			case "vote":
+				PlayerVote pv = (PlayerVote)event;
+				break;
+		
+			default:
+				System.out.println(event.getType());
+		}
 	}
 	
 }

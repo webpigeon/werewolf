@@ -35,7 +35,10 @@ public abstract class VoteAction extends NewAction {
 
 	@Override
 	public void execute(String name, WolfController controller, WolfModel model) {
-		super.execute(name, controller, model);
+		//super.execute(name, controller, model);
+		if (!isPermittedState(controller.getState())){
+			return;
+		}
 		
 		if (isValid(name, controller, model)) {
 			VoteService<String> service = controller.getVoteService();
@@ -93,5 +96,7 @@ public abstract class VoteAction extends NewAction {
 		}
 	}
 	
-	
+	public String getTarget() {
+		return candidate;
+	}
 }

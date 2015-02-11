@@ -65,23 +65,27 @@ public class GraphicalGameListener implements GameListener {
 	}
 
 	@Override
-	public void onDeath(String player, String cause) {
+	public void onDeath(String player, String cause, String role) {
 		playerList.remove(player);
 		controller.setPlayers(playerList);
 		
 		if ("eat".equals(cause)) {
-			controller.appendText("The villagers discover the remains of <b>" +player+"</b> who has been eaten by a wolf. The villagers morn the loss.");
+			controller.appendText("The villagers discover the remains of <b>" +player+"</b> who has been eaten by a wolf. They turn out to be a <b>"+role+"</b>. The villagers morn the loss.");
 			return;
 		}
 		
 		if ("lynch".equals(cause)) {
-			controller.appendText("Against "+player+"'s protests, the villagers string them up and lynch them.");
+			controller.appendText("Against "+player+"'s protests, the villagers string them up and lynch them. They turn out to be a <b>"+role+"</b>");
 			return;
 		}
 	}
 
 	@Override
 	public void onVoteEntered(String voter, String candidate) {
+		if (candidate == null){
+			controller.printContext(voter+" has abstained from voting");
+			return;
+		}
 		controller.printContext(voter+" has voted for "+candidate);
 	}
 

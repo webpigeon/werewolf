@@ -22,7 +22,7 @@ public class BehavourPlayer extends AbstractPlayer {
 	public ActionI selectAction(BeliefSystem system) {
 		
 		for (Behavour behavour : behavours) {
-			if (behavour.canActivate(system)) {
+			if (behavour.canActivate(system, currentAction)) {
 				return behavour.generateAction(system);
 			}
 		}

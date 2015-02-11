@@ -19,8 +19,8 @@ public interface GameListener {
 
 	void onMessage(String player, String message, String channel);
 
-	void onDeath(String player, String cause);
-
 	void onVoteEntered(String voter, String candidate);
+
+	void onDeath(String player, String cause, String role);
 
 }

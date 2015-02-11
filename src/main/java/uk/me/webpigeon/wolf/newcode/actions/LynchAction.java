@@ -21,5 +21,4 @@ public class LynchAction extends VoteAction {
 		return model.isAlivePlayer(name);
 	}
 
-
 }

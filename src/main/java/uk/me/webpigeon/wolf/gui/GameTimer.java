@@ -54,7 +54,7 @@ public class GameTimer implements GameListener {
 	}
 
 	@Override
-	public void onDeath(String victim, String cause) {
+	public void onDeath(String victim, String cause, String role) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -60,7 +60,7 @@ public class Event2Listener implements Runnable, SessionManager {
 
 				case "death":
 					PlayerDeath pd = (PlayerDeath)event;
-					listener.onDeath(pd.player, pd.cause);
+					listener.onDeath(pd.player, pd.cause, pd.role);
 					break;
 					
 				case "vote":
