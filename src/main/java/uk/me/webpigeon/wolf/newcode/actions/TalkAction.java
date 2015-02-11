@@ -19,4 +19,8 @@ public class TalkAction extends NewAction {
 		}
 	}
 
+	public String toString() {
+		return "talk("+player+","+message+")";
+	}
+	
 }

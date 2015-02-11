@@ -13,5 +13,9 @@ public class StateChanged implements EventI {
 	public String getType() {
 		return "stateChange";
 	}
+	
+	public String toString() {
+		return "stateChange("+newState+")";
+	}
 
 }

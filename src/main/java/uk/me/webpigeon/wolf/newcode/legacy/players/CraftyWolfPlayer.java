@@ -13,12 +13,6 @@ import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 
 public class CraftyWolfPlayer extends BasicIntelligencePlayer {
-	private Pattern messageRegex;
-	private ActionI currentAction;
-	
-	public CraftyWolfPlayer() {
-		messageRegex = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
-	}
 	
 	public void notifyVote(String voter, String votee) {		
 		//if they vote for me I don't like them
@@ -55,82 +49,6 @@ public class CraftyWolfPlayer extends BasicIntelligencePlayer {
 				recordBias(voter, 10);
 			}
 		}
-	}
-	
-	@Override
-	protected void takeAction(Collection<ActionI> legalActions) {	
-		if (legalActions.isEmpty()) {
-			return;
-		}
-		
-		List<String> players = controller.getAlivePlayers();
-		String selected = selectPlayer(getScores(players), players, controller.getStage());
-		ActionI selectedAction = null;
-		
-		
-		for (ActionI action : legalActions) {
-			if (selectedAction == null) {
-				selectedAction = action;
-			}
-			
-			if (action.isTarget(selected)) {
-				selectedAction = action;
-				break;
-			}
-		}
-		
-		if (selectedAction == null && !legalActions.isEmpty()) {
-			think("I didn't select any action to perform");
-			return;
-		}
-		
-		
-		if (currentAction == null || !selectedAction.equals(currentAction)) {
-			if (currentAction != null) {
-				think("I changed my mind, I want to "+selectedAction+" rather than "+currentAction);
-			}
-			controller.act(selectedAction);
-			currentAction = selectedAction;
-		} else {
-			think("I already want to "+currentAction);
-		}
-
-	}
-	
-	private String selectPlayer(Map<String, Integer> scores, List<String> players, GameState state) {
-		String minPlayer = null;
-		int minScore = Integer.MIN_VALUE;
-		
-		String maxPlayer = null;
-		int maxScore = Integer.MAX_VALUE;
-		
-		for (String player : players) {
-			Integer score = scores.get(player);
-			if (score == null) {
-				score = 1; //we don't know about this player
-			}
-			
-			if (minScore < score) {
-				minPlayer = player;
-				minScore = score;
-			}
-			
-			if (maxScore > score) {
-				maxPlayer = player;
-				maxScore = score;
-			}
-		}
-		
-		if ("wolf".equals(getRole()) && state == GameState.NIGHTTIME) {
-			return maxPlayer;
-		} else {
-			return minPlayer;
-		}
-	}
-
-	@Override
-	protected void clearTurnLocks() {
-		currentAction = null;
 	}
 	
 }

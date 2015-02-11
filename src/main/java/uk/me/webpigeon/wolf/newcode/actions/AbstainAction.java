@@ -1,6 +1,5 @@
 package uk.me.webpigeon.wolf.newcode.actions;
 
-import uk.me.webpigeon.wolf.VoteService;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
 
@@ -13,8 +12,14 @@ public class AbstainAction implements ActionI {
 
 	@Override
 	public void execute(WolfController controller, WolfModel model) {
-		VoteService service = controller.getVoteService();
+		//VoteService service = controller.getVoteService();
 		//service.vote(voter, null);
 	}
+	
+	public boolean equals(Object other) {
+		return (other != null) && other instanceof AbstainAction;
+	}
+	
+	
 
 }

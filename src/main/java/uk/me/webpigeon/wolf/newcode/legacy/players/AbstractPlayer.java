@@ -15,11 +15,8 @@ import uk.me.webpigeon.wolf.PlayerController;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 public abstract class AbstractPlayer implements ActionListener, GameObserver {
-	private static final Integer THINK_MULTIPLIER = 20;
-	private static final Integer MIN_THINK_TIME = 500;
-	
-	private Random random;
 	private String name;
+	protected RoleI myRole;
 	protected Map<String, String> roles;
 	protected GameController controller;
 	private boolean alive;
@@ -27,7 +24,6 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver {
 	public AbstractPlayer() {
 		this.roles = new TreeMap<String, String>();
 		this.controller = null;
-		this.random = new Random();
 		this.alive = true;
 	}
 	
@@ -37,7 +33,7 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver {
 	}
 	
 	public String getRole() {
-		return roles.get(name);
+		return myRole.getName();
 	}
 	
 	public final String getName() {
@@ -60,12 +56,16 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver {
 	
 	@Override
 	public void notifyRole(String player, RoleI role) {		
+		if (name.equals(player) && myRole == null) {
+			this.myRole = role;
+		}
+		
 		roles.put(player, role.getName());
 		think("I think that "+player+" is a "+role);
 	}
 	
 	protected void think(String thought) {
-		System.out.println("*"+name+"* "+thought);
+		//System.out.println("*"+name+"* "+thought);
 	}
 
 	@Override

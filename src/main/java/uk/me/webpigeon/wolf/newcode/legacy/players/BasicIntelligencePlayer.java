@@ -4,12 +4,19 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import uk.me.webpigeon.wolf.GameState;
+import uk.me.webpigeon.wolf.RoleI;
+import uk.me.webpigeon.wolf.newcode.actions.AbstainAction;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.EatAction;
+import uk.me.webpigeon.wolf.newcode.actions.LynchAction;
+import uk.me.webpigeon.wolf.newcode.actions.SeeAction;
 
 public class BasicIntelligencePlayer extends AbstractPlayer {
 	private Pattern messageRegex;
@@ -17,10 +24,13 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 	private ActionI currentAction;
 	private Set<String> sharedInfomation;
 	
+	private Random r;
+	
 	public BasicIntelligencePlayer() {
 		baises = new TreeMap<String, Integer>();
 		messageRegex = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
 		sharedInfomation = new HashSet<String>();
+		r = new Random();
 	}
 	
 	public void recordBias(String player, int biasDelta) {
@@ -98,36 +108,51 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			return;
 		}
 		
-		List<String> players = controller.getAlivePlayers();
-		String selected = selectPlayer(getScores(players), players);
-		ActionI selectedAction = null;
+		String myRole = getRole();
+		GameState state = controller.getStage();
 		
-		
-		for (ActionI action : legalActions) {
-			if (selectedAction == null) {
-				selectedAction = action;
-			}
-			
-			if (action.isTarget(selected)) {
-				selectedAction = action;
-				break;
-			}
-		}
-		
-		if (selectedAction == null && !legalActions.isEmpty()) {
-			think("I didn't select any action to perform");
+		// if it's night time and we're a villager, the only thing we can do is sleep
+		if (state == GameState.NIGHTTIME && "villager".equals(myRole)) {
+			takeAction(new AbstainAction());
 			return;
 		}
 		
-		
-		if (currentAction == null || !selectedAction.equals(currentAction)) {
-			if (currentAction != null) {
-				think("I changed my mind, I want to "+selectedAction+" rather than "+currentAction);
-			}
-			controller.act(selectedAction);
-			currentAction = selectedAction;
+		// if it's night time and we're the wolf, we eat someone
+		if (state == GameState.NIGHTTIME && "wolf".equals(myRole)) {
+			List<String> players = controller.getAlivePlayers();
+			String selected = selectPlayer(getScores(players, myRole, state), players, state);
+			
+			takeAction(new EatAction(getName(), selected));
+			return;
 		}
+		
+		// if it's night time and we're the seer, we see someone
+		if (state == GameState.NIGHTTIME && "seer".equals(myRole)) {
+			List<String> players = controller.getAlivePlayers();
+			String selected = selectPlayer(getScores(players, myRole, state), players, state);
+			
+			takeAction(new SeeAction(getName(), selected));
+			return;
+		}
+		
+		// we need to pick someone to lynch
+		if (state == GameState.DAYTIME) {
+			List<String> players = controller.getAlivePlayers();
+			String selected = selectPlayer(getScores(players, myRole, state), players, state);
+			
+			takeAction(new LynchAction(getName(), selected));
+			return;
+		}	
 
+	}
+	
+	protected void takeAction(ActionI action) {
+		if (action.equals(currentAction)) {
+			return;
+		}
+		
+		controller.act(action);
+		currentAction = action;
 	}
 	
 	public void shareInfomation(String node, String prop, String subject) {
@@ -138,12 +163,10 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		}
 	}
 	
-	private String selectPlayer(Map<String, Integer> scores, List<String> players) {
-		String minPlayer = null;
-		int minScore = Integer.MIN_VALUE;
+	protected String selectPlayer(Map<String, Integer> scores, List<String> players, GameState state) {
 		
 		String maxPlayer = null;
-		int maxScore = Integer.MAX_VALUE;
+		int maxScore = Integer.MIN_VALUE;
 		
 		for (String player : players) {
 			Integer score = scores.get(player);
@@ -151,27 +174,19 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 				score = 1; //we don't know about this player
 			}
 			
-			if (minScore < score) {
-				minPlayer = player;
-				minScore = score;
-			}
-			
-			if (maxScore > score) {
+			if (maxScore < score) {
 				maxPlayer = player;
 				maxScore = score;
 			}
 		}
 		
-		if ("wolf".equals(getRole())) {
-			return maxPlayer;
-		} else {
-			return minPlayer;
-		}
+		return maxPlayer;
 	}
 	
-	protected Map<String, Integer> getScores(List<String> players) {
+	protected Map<String, Integer> getScores(List<String> players, String ourRole, GameState currentState) {
 		
 		Map<String, Integer> scores = new TreeMap<String, Integer>();
+		
 		for (String player : players) {
 			String beliefRole = roles.get(player);
 			Integer bias = baises.get(player);
@@ -179,20 +194,61 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 				bias = 0;
 			}
 			
+			//we don't want to select ourselves
+			if (player.equals(getName())) {
+				scores.put(player, Integer.MIN_VALUE);
+				continue;
+			}
+		
 			if (beliefRole != null) {
+				if ("seer".equals(ourRole) && currentState == GameState.NIGHTTIME) {
+					scores.put(player, -1000 + bias);
+					continue;
+				}
+				
 				if ("seer".equals(beliefRole)) {
-					scores.put(player, -10 + bias);
+					if ("wolf".equals(ourRole)) {
+						if (currentState == GameState.DAYTIME) {
+							scores.put(player, -10 + bias);
+						} else {
+							System.out.println(getName()+" targeting seer "+player);
+							scores.put(player, 1000 + bias);
+						}
+					} else {
+						scores.put(player, -100 + bias);
+					}
 				}
 				
 				if ("villager".equals(beliefRole)) {
-					scores.put(player, -5 + bias);
+					if ("wolf".equals(ourRole)) {
+						if (currentState == GameState.DAYTIME) {
+							scores.put(player, 5 + bias);
+						} else {
+							scores.put(player, 100 + bias);
+						}
+					} else {
+						scores.put(player, -10 + bias);
+					}
 				}
 				
 				if ("wolf".equals(beliefRole)) {
-					scores.put(player, 10 + bias);
+					if ("wolf".equals(ourRole)) {
+						if (currentState == GameState.DAYTIME) {
+							scores.put(player, -10 + bias);
+						} else {
+							scores.put(player, -1000 + bias);
+						}
+					} else {
+						scores.put(player, 1000);
+					}
 				}
 			} else {
-				scores.put(player, 0 + bias);
+				if ("seer".equals(ourRole) && currentState == GameState.NIGHTTIME) {
+					scores.put(player, 1000 + bias);
+					continue;
+				} else {
+					scores.put(player, 0 + bias);
+				}
 			}
 			
 		}

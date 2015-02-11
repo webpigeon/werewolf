@@ -51,7 +51,6 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 			
 			ActionI action = selectAction(system);
 			if (action != null && !action.equals(currentAction)) {
-				System.out.println("performing action");
 				actionQueue.add(action);
 				currentAction = action;
 			}

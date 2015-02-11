@@ -1,23 +1,28 @@
 package uk.me.webpigeon.wolf.newcode.actions;
 
+import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.VoteService;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
 
-public abstract class VoteAction implements ActionI {
+public abstract class VoteAction extends NewAction {
 	
 	private String voteVerb;
-	private String name;
+	protected final String name;
 	private String candidate;
 	private boolean publicVote;
 	
 	public VoteAction(String candidate, boolean publicVote) {
+		super(GameState.DAYTIME, GameState.NIGHTTIME);
+		this.name = null;
 		this.voteVerb = "vote for";
 		this.candidate = candidate;
 		this.publicVote = publicVote;
 	}
 	
 	public VoteAction(String verb, String candidate, boolean publicVote) {
+		super(GameState.DAYTIME, GameState.NIGHTTIME);
+		this.name = null;
 		this.voteVerb = verb;
 		this.candidate = candidate;
 		this.publicVote = publicVote;
@@ -25,33 +30,36 @@ public abstract class VoteAction implements ActionI {
 	
 	
 	public VoteAction(String verb, String voter, String candidate, boolean publicVote) {
+		super(GameState.DAYTIME, GameState.NIGHTTIME);
 		this.voteVerb = verb;
 		this.name = voter;
 		this.candidate = candidate;
 		this.publicVote = publicVote;
 	}
 	
-	public boolean isTarget(String name) {
-		return candidate.equals(name);
-	}
-	
 	@Override
 	public String toString() {
 		return voteVerb+" "+candidate;
 	}
+	
+	protected abstract boolean isValid(WolfController controller, WolfModel model);
 
 	@Override
 	public void execute(WolfController controller, WolfModel model) {
-		VoteService<String> service = controller.getVoteService();
-		if (service != null) {
-			service.vote(name, candidate);
-			
-			if (publicVote) {
-				controller.announceVote(name, candidate);
-			}
-			
-			if (service.isFinished()) {
-				controller.addTask(new AdvanceTurn());
+		super.execute(controller, model);
+		
+		if (isValid(controller, model)) {
+			VoteService<String> service = controller.getVoteService();
+			if (service != null) {
+				service.vote(name, candidate);
+				
+				if (publicVote) {
+					controller.announceVote(name, candidate);
+				}
+				
+				/*if (service.isFinished()) {
+					controller.addTask(new AdvanceTurn());
+				}*/
 			}
 		}
 	}
@@ -71,31 +79,16 @@ public abstract class VoteAction implements ActionI {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		
+		try {
+			VoteAction other = (VoteAction)obj;
+			return voteVerb.equals(other.voteVerb) && candidate.equals(other.candidate) && name.equals(other.name);
+		} catch (ClassCastException ex) {
 			return false;
-		VoteAction other = (VoteAction) obj;
-		if (candidate == null) {
-			if (other.candidate != null)
-				return false;
-		} else if (!candidate.equals(other.candidate))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (publicVote != other.publicVote)
-			return false;
-		if (voteVerb == null) {
-			if (other.voteVerb != null)
-				return false;
-		} else if (!voteVerb.equals(other.voteVerb))
-			return false;
-		return true;
+		}
 	}
 	
 	

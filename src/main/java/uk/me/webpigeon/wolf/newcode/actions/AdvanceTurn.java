@@ -44,21 +44,20 @@ public class AdvanceTurn extends NewAction {
 			RoleI victimRole = model.getRole(victim);
 			model.removePlayer(victim);
 			
-			System.out.println(victim+" ("+victimRole+") is now dead");
-			
 			// Step 3. tell people who died
-			controller.announceRole(victim, victimRole);
 			controller.announceDeath(victim, victimRole, currentState==GameState.DAYTIME?"lynch":"eat");
+			controller.announceRole(victim, victimRole);
 			
 			if (model.isGameOver()) {
 				controller.addTask(new EndGame());
+				return;
 			}
 		}
 		
 		
 		// setup the new voting service
-		//Collection<String> voteTokens = (newState == GameState.DAYTIME ? model.getPlayers() : model.getWolves() );
-		Collection<String> voteTokens = Collections.emptyList();
+		Collection<String> voteTokens = (newState == GameState.DAYTIME ? model.getPlayers() : model.getWolves() );
+		//Collection<String> voteTokens = Collections.emptyList();
 		voteService = new VoteService<String>(voteTokens);
 		controller.setVoteService(voteService);
 		

@@ -15,4 +15,8 @@ public class PlayerRole implements EventI {
 	public String getType() {
 		return "role";
 	}
+	
+	public String toString() {
+		return "role("+name+","+role+")";
+	}
 }

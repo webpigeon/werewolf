@@ -95,4 +95,8 @@ public class WolfModel {
 		return wolves.isEmpty() || wolves.size() >= villagers.size();
 	}
 
+	public Collection<String> getWolves() {
+		return teams.get(Team.WOLVES);
+	}
+
 }

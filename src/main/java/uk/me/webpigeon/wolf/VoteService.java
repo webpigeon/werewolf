@@ -24,6 +24,11 @@ public class VoteService <T> {
 	}
 	
 	public synchronized void vote(T voter, T votee) {
+		if (!voteTokens.contains(voter)) {
+			System.err.println("non-permitted voter "+voter+" attempted to vote. Allowed voters are "+voteTokens);
+			return;
+		}
+		
 		T currentVote = votes.get(voter);
 		if (currentVote != null) {
 			int totalVotes = getVotesFor(currentVote);
