@@ -58,4 +58,10 @@ public class GameTimer implements GameListener {
 		
 	}
 
+	@Override
+	public void onVoteEntered(String voter, String candidate) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

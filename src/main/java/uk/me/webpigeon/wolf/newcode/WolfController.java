@@ -145,4 +145,24 @@ public class WolfController implements Runnable {
 		}
 	}
 
+	public void announceVote(String voter, String candidate) {
+		for (GameListener listener : listeners) {
+			listener.onVoteEntered(voter, candidate);
+		}
+	}
+
+	public void sendRole(String seer, String seen, RoleI seenRole) {
+		assert seer != null;
+		assert seen != null;
+		assert model.isAlivePlayer(seer);
+		
+		GameListener seerListener = playerListeners.get(seer);
+		if (seerListener == null) {
+			//there is no player with that name
+			return;
+		}
+		
+		seerListener.onDiscoverRole(seen, seenRole);
+	}
+
 }

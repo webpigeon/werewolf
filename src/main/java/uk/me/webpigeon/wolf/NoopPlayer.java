@@ -14,4 +14,10 @@ public class NoopPlayer extends AbstractPlayer {
 		think("I am not taking any actions");
 	}
 
+	@Override
+	protected void clearTurnLocks() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

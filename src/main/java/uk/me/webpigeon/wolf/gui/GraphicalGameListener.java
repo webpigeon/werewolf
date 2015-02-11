@@ -77,4 +77,9 @@ public class GraphicalGameListener implements GameListener {
 		}
 	}
 
+	@Override
+	public void onVoteEntered(String voter, String candidate) {
+		controller.printContext(voter+" has voted for "+candidate);
+	}
+
 }

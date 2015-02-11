@@ -26,8 +26,9 @@ public class WolfUtils {
 	
 	public static List<RoleI> buildRoleList() {
 		RoleI wolf = new WolfRole();
+		RoleI seer = new SeerRole();
 		
-		return Arrays.asList(wolf);
+		return Arrays.asList(wolf, seer);
 	}
 
 	public static RoleI getDefaultRole() {

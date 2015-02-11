@@ -25,4 +25,10 @@ public class RandomPlayer extends AbstractPlayer {
 		}
 	}
 
+	@Override
+	protected void clearTurnLocks() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

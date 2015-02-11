@@ -16,5 +16,6 @@ public interface GameListener {
 	void onStateChange(GameState newState);
 	void onMessage(String player, String message, String channel);
 	void onDeath(String victim, String cause);
+	void onVoteEntered(String voter, String candidate);
 
 }

@@ -59,4 +59,9 @@ public class LegacyWrapper implements GameListener {
 		player.notifyDeath(victim, cause);
 	}
 
+	@Override
+	public void onVoteEntered(String voter, String candidate) {
+		player.notifyVote(voter, candidate);
+	}
+
 }

@@ -71,7 +71,7 @@ public class AbstractRole implements RoleI {
 	}
 
 	@Override
-	public Object getName() {
+	public String getName() {
 		return name;
 	}
 	

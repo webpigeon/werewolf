@@ -1,23 +1,29 @@
 package uk.me.webpigeon.wolf;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
+import javax.swing.Timer;
+
 import uk.me.webpigeon.wolf.action.ActionI;
-public abstract class AbstractPlayer implements GameObserver, Runnable {
+public abstract class AbstractPlayer implements ActionListener, GameObserver, Runnable {
 	private static final Integer MAX_THINK_DELTA = 500;
 	private static final Integer MIN_THINK_TIME = 5000;
 	
+	private Timer timer;
 	private Random random;
 	private String name;
-	protected Map<String, RoleI> roles;
+	protected Map<String, String> roles;
 	protected GameController controller;
 	private boolean alive;
 	
 	public AbstractPlayer() {
-		this.roles = new TreeMap<String, RoleI>();
+		this.timer = new Timer(MIN_THINK_TIME, this);
+		this.roles = new TreeMap<String, String>();
 		this.controller = null;
 		this.random = new Random();
 		this.alive = true;
@@ -26,9 +32,10 @@ public abstract class AbstractPlayer implements GameObserver, Runnable {
 	public void bind(GameController controller) {
 		this.controller = controller;
 		this.name = controller.getName();
+		timer.start();
 	}
 	
-	public RoleI getRole() {
+	public String getRole() {
 		return roles.get(name);
 	}
 	
@@ -42,19 +49,19 @@ public abstract class AbstractPlayer implements GameObserver, Runnable {
 	
 	@Override
 	public void notifyDaytime(PlayerController controller) {
-		// TODO Auto-generated method stub
-		
+		timer.restart();
+		clearTurnLocks();
 	}
 
 	@Override
 	public void notifyNighttime(PlayerController controller) {
-		// TODO Auto-generated method stub
-		
+		timer.restart();
+		clearTurnLocks();
 	}
 	
 	@Override
 	public void notifyRole(String player, RoleI role) {		
-		roles.put(player, role);
+		roles.put(player, role.getName());
 		think("I think that "+player+" is a "+role);
 	}
 	
@@ -70,6 +77,7 @@ public abstract class AbstractPlayer implements GameObserver, Runnable {
 	public void notifyDeath(String who, String how) {
 		if (who.equals(name)) {
 			alive = false;
+			timer.stop();
 		}
 	}
 	
@@ -99,7 +107,32 @@ public abstract class AbstractPlayer implements GameObserver, Runnable {
 			}
 		}
 	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		triggerAction();
+	}
+	
+	protected void triggerAction() {
+		if (!alive) {
+			return;
+		}
+		
+		GameState state = controller.getStage();
+		
+		if (state == GameState.DAYTIME) {
+			takeAction(controller.getLegalActions());
+			timer.restart();
+		} else if (state == GameState.NIGHTTIME) {
+			takeAction(controller.getLegalActions());
+			timer.restart();
+		} else if (state == GameState.GAMEOVER) {
+			think("the game is over");
+			timer.stop();
+		}
+	}
 
 	protected abstract void takeAction(Collection<ActionI> collection);
+	protected abstract void clearTurnLocks();
 
 }

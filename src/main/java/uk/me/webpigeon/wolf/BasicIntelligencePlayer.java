@@ -1,47 +1,98 @@
 package uk.me.webpigeon.wolf;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import uk.me.webpigeon.wolf.action.ActionI;
 
 public class BasicIntelligencePlayer extends AbstractPlayer {
+	private Pattern messageRegex;
 	private Map<String, Integer> baises;
+	private ActionI currentAction;
+	private Set<String> sharedInfomation;
 	
 	public BasicIntelligencePlayer() {
-		this.baises = new TreeMap<String, Integer>();
+		baises = new TreeMap<String, Integer>();
+		messageRegex = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
+		sharedInfomation = new HashSet<String>();
 	}
 	
 	public void notifyVote(String voter, String votee) {
-		if (votee.equals(getName())) {
-			Integer bias = baises.get(voter);
-			if (bias == null) {
-				bias = 0;
-			}
-			baises.put(voter, bias+1);
-			think(voter +" voted for me :( ");
+		Integer voterBias = baises.get(voter);
+		think("I heard that "+voter+" voted for "+votee);
+		think("my biases are "+baises);
+		if (voterBias == null) {
+			voterBias = 0;
 		}
 		
-		/*if (getRole() == Role.SEER) {
-			Role voteeRole = roles.get(votee);
-			if (voteeRole == Role.VILLAGER) {
-				controller.talk(voter+": "+votee+" is a villager");
-			}
-		}*/
+		//if they vote for me I don't like them
+		if (votee.equals(getName())) {
+			baises.put(voter, voterBias+1);
+		}
 		
+		// If I'm the seer and I know that the person is not a wolf, I tell people
+		if ("seer".equals(getRole())) {
+			String voteeRole = roles.get(votee);
+			
+			if (voteeRole != null) {
+				String infomation = "("+votee+","+"role,"+voteeRole+")";
+				if (!sharedInfomation.contains(infomation)) {
+					controller.talk(infomation);
+					sharedInfomation.add(infomation);
+				}
+			}
+		}
+		
+		String voteeRole = roles.get(votee);
+		if (voteeRole != null) {
+			if ("wolf".equals(voteeRole)) {
+				// the person voted for the wolf
+				baises.put(voter, voterBias-1);
+			} else if ("seer".equals(voteeRole)) {
+				// if they vote for the seer, They're probably a moron or the wolf
+				baises.put(voter, voterBias+10);
+			}
+		}
+		
+		think("my biases are now "+baises);
 	}
 	
 	public void notifyMessage(String who, String message){
 		
+		Matcher m = messageRegex.matcher(message);
+		if (m.matches()) {
+			
+			String g1 = m.group(1);
+			String g2 = m.group(2);
+			String g3 = m.group(3);
+			
+			if ("role".equals(g2)) {
+				think(who+" told me that "+g1+" is a "+g3);
+				roles.put(g1, g3);
+				triggerAction();
+			}
+			
+		}
+		
 	}
 	
 	@Override
-	protected void takeAction(Collection<ActionI> legalActions) {		
+	protected void takeAction(Collection<ActionI> legalActions) {	
+		if (legalActions.isEmpty()) {
+			return;
+		}
+		
 		List<String> players = controller.getAlivePlayers();
 		String selected = selectPlayer(getScores(players), players);
 		ActionI selectedAction = null;
+		
+		think("My target is "+selected);
 		
 		for (ActionI action : legalActions) {
 			if (action.isTarget(selected)) {
@@ -50,9 +101,20 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			}
 		}
 		
-		if (selectedAction != null) {
-			think("I want to "+selectedAction);
+		if (selectedAction == null && !legalActions.isEmpty()) {
+			think("I didn't select any action to perform");
+			return;
+		}
+		
+		
+		if (currentAction == null || !selectedAction.equals(currentAction)) {
+			if (currentAction != null) {
+				think("I changed my mind, I want to "+selectedAction+" rather than "+currentAction);
+			}
 			controller.act(selectedAction);
+			currentAction = selectedAction;
+		} else {
+			think("I already want to "+currentAction);
 		}
 
 	}
@@ -81,7 +143,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			}
 		}
 		
-		if ("wolf".equals(getRole().getName())) {
+		if ("wolf".equals(getRole())) {
 			return maxPlayer;
 		} else {
 			return minPlayer;
@@ -92,22 +154,22 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		
 		Map<String, Integer> scores = new TreeMap<String, Integer>();
 		for (String player : players) {
-			RoleI beliefRole = roles.get(player);
+			String beliefRole = roles.get(player);
 			Integer bias = baises.get(player);
 			if (bias == null) {
 				bias = 0;
 			}
 			
 			if (beliefRole != null) {
-				if ("seer".equals(beliefRole.getName())) {
+				if ("seer".equals(beliefRole)) {
 					scores.put(player, -10 + bias);
 				}
 				
-				if ("villager".equals(beliefRole.getName())) {
+				if ("villager".equals(beliefRole)) {
 					scores.put(player, -5 + bias);
 				}
 				
-				if ("wolf".equals(beliefRole.getName())) {
+				if ("wolf".equals(beliefRole)) {
 					scores.put(player, 10 + bias);
 				}
 			} else {
@@ -119,4 +181,9 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		return scores;
 	}
 
+	@Override
+	protected void clearTurnLocks() {
+		currentAction = null;
+	}
+	
 }
