@@ -6,22 +6,15 @@ import java.util.List;
 public class WolfUtils {
 
 	public static GameObserver buildSmartPlayer() {
-		return buildRunnablePlayer(new BasicIntelligencePlayer());
+		return new BasicIntelligencePlayer();
 	}
 	
 	public static GameObserver buildRandomPlayer() {
-		return buildRunnablePlayer(new RandomPlayer());
+		return new RandomPlayer();
 	}
 	
 	public static GameObserver buildNoopPlayer() {
-		return buildRunnablePlayer(new NoopPlayer());
-	}
-	
-	public static GameObserver buildRunnablePlayer(AbstractPlayer p) {
-		Thread pThread = new Thread(p);
-		pThread.setName("player-thread-"+System.nanoTime());
-		pThread.start();
-		return p;
+		return new NoopPlayer();
 	}
 	
 	public static List<RoleI> buildRoleList() {

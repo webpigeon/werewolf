@@ -3,6 +3,7 @@ package uk.me.webpigeon.wolf.newcode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -12,8 +13,14 @@ import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.VoteService;
 import uk.me.webpigeon.wolf.WolfUtils;
 import uk.me.webpigeon.wolf.action.ActionI;
-import uk.me.webpigeon.wolf.newcode.actions.AdvanceTurn;
 import uk.me.webpigeon.wolf.newcode.actions.StartGame;
+import uk.me.webpigeon.wolf.newcode.events.ChatMessage;
+import uk.me.webpigeon.wolf.newcode.events.EventI;
+import uk.me.webpigeon.wolf.newcode.events.GameStarted;
+import uk.me.webpigeon.wolf.newcode.events.PlayerDeath;
+import uk.me.webpigeon.wolf.newcode.events.PlayerRole;
+import uk.me.webpigeon.wolf.newcode.events.PlayerVote;
+import uk.me.webpigeon.wolf.newcode.events.StateChanged;
 
 public class WolfController implements Runnable {
 	
@@ -21,16 +28,20 @@ public class WolfController implements Runnable {
 	private GameState state;
 	private VoteService<String> service;
 	
-	private Collection<GameListener> listeners;
-	private Map<String, GameListener> playerListeners;
+	private Collection<SessionManager> listeners;
+	
+	private Collection<Queue<EventI>> events;
+	private Map<String, Queue<EventI>> playerEvents;
 	private BlockingQueue<ActionI> actions;
 
 	public WolfController(WolfModel model) {
 		this.model = model;
 		this.state = GameState.INIT;
 		
-		this.listeners = new ArrayList<GameListener>();
-		this.playerListeners = new TreeMap<String, GameListener>();
+		this.listeners = new ArrayList<SessionManager>();
+		this.events = new ArrayList<>();
+		this.playerEvents = new TreeMap<>();
+		
 		this.actions = new LinkedBlockingQueue<ActionI>();
 	}
 	
@@ -42,22 +53,29 @@ public class WolfController implements Runnable {
 		return service;
 	}
 	
-	public void addListener(GameListener listener) {
+	public void addListener(SessionManager listener) {
 		assert listener != null : "Listener cannot be null";
 		assert state == GameState.INIT;
 		listeners.add(listener);
+		
+		BlockingQueue<EventI> playerEventQueue = new LinkedBlockingQueue<EventI>();
+		events.add(playerEventQueue);
+		listener.bind(null, null, playerEventQueue);
 	}
 	
-	public void addPlayer(String name, GameListener listener) {
+	public void addPlayer(String name, SessionManager listener) {
 		assert name != null : "name cannot be null";
 		assert listener != null : "listener cannot be null";
-		assert !playerListeners.containsKey(name) : "already a player with that name";
+		assert !playerEvents.containsKey(name) : "already a player with that name";
 		
 		model.addPlayer(name);
 		listeners.add(listener);
-		playerListeners.put(name, listener);
 		
-		listener.onJoin(name, actions);
+		BlockingQueue<EventI> playerEventQueue = new LinkedBlockingQueue<EventI>();
+		events.add(playerEventQueue);
+		playerEvents.put(name, playerEventQueue);
+		
+		listener.bind(name, actions, playerEventQueue);
 	}
 	
 	public void startGame() {
@@ -71,11 +89,23 @@ public class WolfController implements Runnable {
 			String player = entry.getKey();
 			RoleI role = entry.getValue();
 			
-			GameListener listener = playerListeners.get(player);
-			listener.onDiscoverRole(player, role);
+			unicast(player, new PlayerRole(player, role));
 		}
 		
 		actions.add(new StartGame());
+	}
+	
+	public void unicast(String player, EventI event) {
+		Queue<EventI> eventQueue = playerEvents.get(player);
+		if (eventQueue != null) {
+			eventQueue.add(event);
+		}
+	}
+	
+	public void broadcast(EventI event) {
+		for (Queue<EventI> queue : events) {
+			queue.add(event);
+		}
 	}
 	
 	@Override
@@ -110,45 +140,34 @@ public class WolfController implements Runnable {
 	public void setState(GameState newState) {
 		this.state = newState;
 	}
-
-	public void announceStart() {
-		for (GameListener listener : listeners) {
-			listener.onGameStart(model.getPlayers());
-		}
-	}
 	
-	public void announceState(GameState newState) {
-		for (GameListener listener : listeners) {
-			listener.onStateChange(newState);
-		}
-	}
-
 	public void addTask(ActionI task) {
 		actions.add(task);
 	}
 
+	public void announceStart() {
+		Collection<String> playerList = model.getPlayers();
+		broadcast(new GameStarted(playerList));
+	}
+	
+	public void announceState(GameState newState) {
+		broadcast(new StateChanged(newState));
+	}
+
 	public void announceMessage(String player, String message, String channel) {
-		for (GameListener listener : listeners) {
-			listener.onMessage(player, message, channel);
-		}
+		broadcast(new ChatMessage(player, message, channel));
 	}
 
 	public void announceDeath(String victim, RoleI victimRole, String cause) {
-		for (GameListener listener : listeners) {
-			listener.onDeath(victim, cause);
-		}
+		broadcast(new PlayerDeath(victim, victimRole.getName(), cause));
 	}
 	
 	public void announceRole(String player, RoleI role) {
-		for (GameListener listener : listeners) {
-			listener.onDiscoverRole(player, role);
-		}
+		broadcast(new PlayerRole(player, role));
 	}
 
 	public void announceVote(String voter, String candidate) {
-		for (GameListener listener : listeners) {
-			listener.onVoteEntered(voter, candidate);
-		}
+		broadcast(new PlayerVote(voter, candidate));
 	}
 
 	public void sendRole(String seer, String seen, RoleI seenRole) {
@@ -156,13 +175,7 @@ public class WolfController implements Runnable {
 		assert seen != null;
 		assert model.isAlivePlayer(seer);
 		
-		GameListener seerListener = playerListeners.get(seer);
-		if (seerListener == null) {
-			//there is no player with that name
-			return;
-		}
-		
-		seerListener.onDiscoverRole(seen, seenRole);
+		unicast(seer, new PlayerRole(seen, seenRole));
 	}
 
 }

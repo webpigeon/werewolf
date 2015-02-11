@@ -77,4 +77,10 @@ public class GraphicalObserver implements GameObserver {
 		return "gui";
 	}
 
+	@Override
+	public void triggerAction() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

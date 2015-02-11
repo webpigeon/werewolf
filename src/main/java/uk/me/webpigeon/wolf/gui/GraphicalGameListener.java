@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.action.ActionI;
 import uk.me.webpigeon.wolf.newcode.GameListener;
+import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.events.EventI;
 
 public class GraphicalGameListener implements GameListener {
 	private WolfFrame controller;
 	private List<String> playerList;
-	
+		
 	public GraphicalGameListener(WolfFrame controller) {
 		this.controller = controller;
 		this.playerList = new ArrayList<String>();

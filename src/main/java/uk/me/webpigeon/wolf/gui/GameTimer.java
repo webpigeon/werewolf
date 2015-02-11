@@ -8,8 +8,9 @@ import javax.swing.Timer;
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.action.ActionI;
-import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.GameListener;
+import uk.me.webpigeon.wolf.newcode.WolfController;
+import uk.me.webpigeon.wolf.newcode.SessionManager;
 
 public class GameTimer implements GameListener {
 	private static final Integer TURN_TIME_LIMIT = 10000;

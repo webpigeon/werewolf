@@ -14,5 +14,7 @@ public interface GameObserver {
 	
 	public String getName();
 
+	public void triggerAction();
+
 
 }

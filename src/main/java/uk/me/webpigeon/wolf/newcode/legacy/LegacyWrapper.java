@@ -1,41 +1,73 @@
 package uk.me.webpigeon.wolf.newcode.legacy;
 
-import java.util.Collection;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
 import uk.me.webpigeon.wolf.GameObserver;
 import uk.me.webpigeon.wolf.GameState;
-import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.action.ActionI;
-import uk.me.webpigeon.wolf.newcode.GameListener;
+import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.events.*;
 
-public class LegacyWrapper implements GameListener {
+public class LegacyWrapper implements Runnable, SessionManager {
 	private GameObserver player;
 	private LegacyController c;
+	private Thread t;
 	
-	public LegacyWrapper(GameObserver gameObserver, LegacyController c) {
-		this.player = gameObserver;
+	private Queue<ActionI> actionQueue;
+	private BlockingQueue<EventI> eventQueue;
+	
+	public LegacyWrapper(GameObserver player, LegacyController c) {
+		this.player = player;
 		this.c = c;
 	}
 
-	@Override
-	public void onGameStart(Collection<String> players) {
+	public void processEvents() throws InterruptedException {
 		
+		do {
+			EventI event = eventQueue.take();
+			
+			switch(event.getType()) {
+				case "role":
+					PlayerRole role = (PlayerRole)event;
+					player.notifyRole(role.name, role.role);
+					break;
+					
+				case "stateChange":
+					StateChanged sc = (StateChanged)event;
+					onStateChange(sc.newState);
+					break;
+
+				case "death":
+					PlayerDeath pd = (PlayerDeath)event;
+					player.notifyDeath(pd.player, pd.cause);
+					break;
+					
+				case "vote":
+					PlayerVote pv = (PlayerVote)event;
+					player.notifyVote(pv.player, pv.vote);
+					break;
+					
+				case "gameStarted":
+					break;
+					
+				case "chat":
+					ChatMessage cm = (ChatMessage)event;
+					if ("public".equals(cm.channel)) {
+						player.notifyMessage(cm.player, cm.message);
+					}
+					break;
+					
+				default:
+					System.err.println("unknown event type "+event.getType());
+			}
+			
+			player.triggerAction();
+			
+		} while(!Thread.interrupted());
 	}
 
-	@Override
-	public void onJoin(String name, Queue<ActionI> actionQueue) {
-		c.setName(name);
-		player.bind(c);
-	}
-
-	@Override
-	public void onDiscoverRole(String playerName, RoleI role) {
-		player.notifyRole(playerName, role);
-	}
-
-	@Override
-	public void onStateChange(GameState newState) {
+	private void onStateChange(GameState newState) {
 		switch (newState) {
 			case DAYTIME:
 				player.notifyDaytime(null);
@@ -48,20 +80,25 @@ public class LegacyWrapper implements GameListener {
 	}
 
 	@Override
-	public void onMessage(String playerName, String message, String channel) {
-		if ("public".equals(channel)) {
-			player.notifyMessage(playerName, message);
+	public void bind(String name, Queue<ActionI> actionQueue, BlockingQueue<EventI> eventQueue) {
+		this.actionQueue = actionQueue;
+		this.eventQueue = eventQueue;
+		
+		c.setName(name);
+		player.bind(c);
+		
+		t = new Thread(this);
+		t.setName("legacy-"+name+"-adapter");
+		t.start();
+	}
+
+	@Override
+	public void run() {
+		try {
+			processEvents();
+		} catch (InterruptedException ex ){
+			ex.printStackTrace();
 		}
-	}
-
-	@Override
-	public void onDeath(String victim, String cause) {
-		player.notifyDeath(victim, cause);
-	}
-
-	@Override
-	public void onVoteEntered(String voter, String candidate) {
-		player.notifyVote(voter, candidate);
 	}
 
 }

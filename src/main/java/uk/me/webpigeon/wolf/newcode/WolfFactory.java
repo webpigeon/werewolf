@@ -28,7 +28,7 @@ public class WolfFactory {
 		return controller;
 	}
 	
-	public static GameListener buildBehavourPlayer() {
+	public static SessionManager buildBehavourPlayer() {
 		BehavourPlayer player = new BehavourPlayer();
 		player.addBehavour(new RandomUnsafeLynch());
 		

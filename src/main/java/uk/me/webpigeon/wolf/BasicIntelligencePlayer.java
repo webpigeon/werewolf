@@ -126,8 +126,6 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			}
 			controller.act(selectedAction);
 			currentAction = selectedAction;
-		} else {
-			think("I already want to "+currentAction);
 		}
 
 	}
@@ -198,8 +196,6 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			}
 			
 		}
-		
-		think("my scores are "+scores);
 		
 		return scores;
 	}

@@ -10,11 +10,10 @@ import java.util.TreeMap;
 import javax.swing.Timer;
 
 import uk.me.webpigeon.wolf.action.ActionI;
-public abstract class AbstractPlayer implements ActionListener, GameObserver, Runnable {
+public abstract class AbstractPlayer implements ActionListener, GameObserver {
 	private static final Integer THINK_MULTIPLIER = 20;
 	private static final Integer MIN_THINK_TIME = 500;
 	
-	private Timer timer;
 	private Random random;
 	private String name;
 	protected Map<String, String> roles;
@@ -22,10 +21,6 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver, Ru
 	private boolean alive;
 	
 	public AbstractPlayer() {
-		this.random = new Random();
-		int timerValue = MIN_THINK_TIME + (int)(random.nextGaussian() * THINK_MULTIPLIER);
-		
-		this.timer = new Timer(timerValue, this);
 		this.roles = new TreeMap<String, String>();
 		this.controller = null;
 		this.random = new Random();
@@ -35,7 +30,6 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver, Ru
 	public void bind(GameController controller) {
 		this.controller = controller;
 		this.name = controller.getName();
-		timer.start();
 	}
 	
 	public String getRole() {
@@ -52,13 +46,11 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver, Ru
 	
 	@Override
 	public void notifyDaytime(PlayerController controller) {
-		timer.restart();
 		clearTurnLocks();
 	}
 
 	@Override
 	public void notifyNighttime(PlayerController controller) {
-		timer.restart();
 		clearTurnLocks();
 	}
 	
@@ -80,7 +72,6 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver, Ru
 	public void notifyDeath(String who, String how) {
 		if (who.equals(name)) {
 			alive = false;
-			timer.stop();
 		}
 	}
 	
@@ -90,24 +81,12 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver, Ru
 	}
 	
 	@Override
-	public void run() {
-		
-		while (!Thread.interrupted() && alive) {
-			// threads shouldn't cause updates anymore
-			try {
-				Thread.sleep(MIN_THINK_TIME);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		triggerAction();
 	}
 	
-	protected void triggerAction() {
+	@Override
+	public final void triggerAction() {
 		if (!alive) {
 			return;
 		}
@@ -116,13 +95,10 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver, Ru
 		
 		if (state == GameState.DAYTIME) {
 			takeAction(controller.getLegalActions());
-			timer.restart();
 		} else if (state == GameState.NIGHTTIME) {
 			takeAction(controller.getLegalActions());
-			timer.restart();
 		} else if (state == GameState.GAMEOVER) {
 			think("the game is over");
-			timer.stop();
 		}
 	}
 

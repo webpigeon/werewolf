@@ -9,13 +9,18 @@ import uk.me.webpigeon.wolf.action.ActionI;
 
 public interface GameListener {
 
-	void onGameStart(Collection<String> players);
-	void onJoin(String name, Queue<ActionI> actionQueue);
-	
 	void onDiscoverRole(String player, RoleI role);
+
+	void onJoin(String name, Queue<ActionI> actionQueue);
+
 	void onStateChange(GameState newState);
+
+	void onGameStart(Collection<String> players);
+
 	void onMessage(String player, String message, String channel);
-	void onDeath(String victim, String cause);
+
+	void onDeath(String player, String cause);
+
 	void onVoteEntered(String voter, String candidate);
 
 }

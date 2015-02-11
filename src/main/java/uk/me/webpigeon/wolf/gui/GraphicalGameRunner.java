@@ -9,8 +9,8 @@ public class GraphicalGameRunner {
 		WolfFrame gui = new WolfFrame();
 				
 		WolfController gameController = WolfFactory.buildGame();
-		gameController.addListener(new GraphicalGameListener(gui));
-		gameController.addListener(new GameTimer(gameController));
+		gameController.addListener(new Event2Listener(new GraphicalGameListener(gui)));
+		gameController.addListener(new Event2Listener(new GameTimer(gameController)));
 		
 		Thread gameThread = new Thread(gameController);
 		gameThread.start();
