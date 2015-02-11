@@ -92,9 +92,12 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		String selected = selectPlayer(getScores(players), players);
 		ActionI selectedAction = null;
 		
-		think("My target is "+selected);
 		
 		for (ActionI action : legalActions) {
+			if (selectedAction == null) {
+				selectedAction = action;
+			}
+			
 			if (action.isTarget(selected)) {
 				selectedAction = action;
 				break;
