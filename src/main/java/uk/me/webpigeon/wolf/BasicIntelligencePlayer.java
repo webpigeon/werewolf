@@ -25,8 +25,6 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 	
 	public void notifyVote(String voter, String votee) {
 		Integer voterBias = baises.get(voter);
-		think("I heard that "+voter+" voted for "+votee);
-		think("my biases are "+baises);
 		if (voterBias == null) {
 			voterBias = 0;
 		}
@@ -59,8 +57,6 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 				baises.put(voter, voterBias+10);
 			}
 		}
-		
-		think("my biases are now "+baises);
 	}
 	
 	public void notifyMessage(String who, String message){
@@ -73,9 +69,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 			String g3 = m.group(3);
 			
 			if ("role".equals(g2)) {
-				think(who+" told me that "+g1+" is a "+g3);
 				roles.put(g1, g3);
-				triggerAction();
 			}
 			
 		}
@@ -122,6 +116,14 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 
 	}
 	
+	public void shareInfomation(String node, String prop, String subject) {
+		String infomation = "("+node+","+prop+","+subject+")";
+		if (!sharedInfomation.contains(infomation)) {
+			controller.talk(infomation);
+			sharedInfomation.add(infomation);
+		}
+	}
+	
 	private String selectPlayer(Map<String, Integer> scores, List<String> players) {
 		String minPlayer = null;
 		int minScore = Integer.MIN_VALUE;
@@ -153,7 +155,7 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 		}
 	}
 	
-	private Map<String, Integer> getScores(List<String> players) {
+	protected Map<String, Integer> getScores(List<String> players) {
 		
 		Map<String, Integer> scores = new TreeMap<String, Integer>();
 		for (String player : players) {
@@ -176,10 +178,12 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 					scores.put(player, 10 + bias);
 				}
 			} else {
-				scores.put(player, -5 + bias);
+				scores.put(player, 0 + bias);
 			}
 			
 		}
+		
+		think("my scores are "+scores);
 		
 		return scores;
 	}

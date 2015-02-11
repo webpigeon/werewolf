@@ -11,22 +11,18 @@ import java.util.regex.Pattern;
 
 import uk.me.webpigeon.wolf.action.ActionI;
 
-public class CraftyWolfPlayer extends AbstractPlayer {
+public class CraftyWolfPlayer extends BasicIntelligencePlayer {
 	private Pattern messageRegex;
 	private Map<String, Integer> baises;
 	private ActionI currentAction;
-	private Set<String> sharedInfomation;
 	
 	public CraftyWolfPlayer() {
 		baises = new TreeMap<String, Integer>();
 		messageRegex = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
-		sharedInfomation = new HashSet<String>();
 	}
 	
 	public void notifyVote(String voter, String votee) {
 		Integer voterBias = baises.get(voter);
-		think("I heard that "+voter+" voted for "+votee);
-		think("my biases are "+baises);
 		if (voterBias == null) {
 			voterBias = 0;
 		}
@@ -65,35 +61,6 @@ public class CraftyWolfPlayer extends AbstractPlayer {
 				baises.put(voter, voterBias+10);
 			}
 		}
-		
-		think("my biases are now "+baises);
-	}
-	
-	public void shareInfomation(String node, String prop, String subject) {
-		String infomation = "("+node+","+prop+","+subject+")";
-		if (!sharedInfomation.contains(infomation)) {
-			controller.talk(infomation);
-			sharedInfomation.add(infomation);
-		}
-	}
-	
-	public void notifyMessage(String who, String message){
-		
-		Matcher m = messageRegex.matcher(message);
-		if (m.matches()) {
-			
-			String g1 = m.group(1);
-			String g2 = m.group(2);
-			String g3 = m.group(3);
-			
-			if ("role".equals(g2)) {
-				think(who+" told me that "+g1+" is a "+g3);
-				roles.put(g1, g3);
-				triggerAction();
-			}
-			
-		}
-		
 	}
 	
 	@Override
@@ -165,37 +132,6 @@ public class CraftyWolfPlayer extends AbstractPlayer {
 		} else {
 			return minPlayer;
 		}
-	}
-	
-	private Map<String, Integer> getScores(List<String> players) {
-		
-		Map<String, Integer> scores = new TreeMap<String, Integer>();
-		for (String player : players) {
-			String beliefRole = roles.get(player);
-			Integer bias = baises.get(player);
-			if (bias == null) {
-				bias = 0;
-			}
-			
-			if (beliefRole != null) {
-				if ("seer".equals(beliefRole)) {
-					scores.put(player, -10 + bias);
-				}
-				
-				if ("villager".equals(beliefRole)) {
-					scores.put(player, -5 + bias);
-				}
-				
-				if ("wolf".equals(beliefRole)) {
-					scores.put(player, 10 + bias);
-				}
-			} else {
-				scores.put(player, -5 + bias);
-			}
-			
-		}
-		
-		return scores;
 	}
 
 	@Override

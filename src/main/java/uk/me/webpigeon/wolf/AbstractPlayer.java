@@ -11,8 +11,8 @@ import javax.swing.Timer;
 
 import uk.me.webpigeon.wolf.action.ActionI;
 public abstract class AbstractPlayer implements ActionListener, GameObserver, Runnable {
-	private static final Integer MAX_THINK_DELTA = 500;
-	private static final Integer MIN_THINK_TIME = 5000;
+	private static final Integer THINK_MULTIPLIER = 20;
+	private static final Integer MIN_THINK_TIME = 500;
 	
 	private Timer timer;
 	private Random random;
@@ -22,7 +22,10 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver, Ru
 	private boolean alive;
 	
 	public AbstractPlayer() {
-		this.timer = new Timer(MIN_THINK_TIME, this);
+		this.random = new Random();
+		int timerValue = MIN_THINK_TIME + (int)(random.nextGaussian() * THINK_MULTIPLIER);
+		
+		this.timer = new Timer(timerValue, this);
 		this.roles = new TreeMap<String, String>();
 		this.controller = null;
 		this.random = new Random();
@@ -90,20 +93,11 @@ public abstract class AbstractPlayer implements ActionListener, GameObserver, Ru
 	public void run() {
 		
 		while (!Thread.interrupted() && alive) {
-			if (controller != null) {
-				GameState state = controller.getStage();
-				if (state == GameState.DAYTIME || state == GameState.NIGHTTIME) {
-					takeAction(controller.getLegalActions());
-				} else if (state == GameState.GAMEOVER) {
-					think("The game is over");
-					alive = false;
-				}
-			}
-			
-			try{
-				Thread.sleep(MIN_THINK_TIME + random.nextInt(MAX_THINK_DELTA));
-			} catch (InterruptedException ex) {
-				
+			// threads shouldn't cause updates anymore
+			try {
+				Thread.sleep(MIN_THINK_TIME);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
