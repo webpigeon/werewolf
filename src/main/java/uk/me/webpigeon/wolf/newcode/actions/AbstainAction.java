@@ -1,4 +1,4 @@
-package uk.me.webpigeon.wolf.action;
+package uk.me.webpigeon.wolf.newcode.actions;
 
 import uk.me.webpigeon.wolf.WolfGame;
 import uk.me.webpigeon.wolf.newcode.WolfController;

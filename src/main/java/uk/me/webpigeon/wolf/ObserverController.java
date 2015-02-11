@@ -3,7 +3,7 @@ package uk.me.webpigeon.wolf;
 import java.util.Collections;
 import java.util.List;
 
-import uk.me.webpigeon.wolf.action.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 
 public class ObserverController implements GameController {
 	private WolfGame game;

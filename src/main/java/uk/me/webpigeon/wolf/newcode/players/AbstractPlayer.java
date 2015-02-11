@@ -6,8 +6,8 @@ import java.util.concurrent.BlockingQueue;
 
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
-import uk.me.webpigeon.wolf.action.ActionI;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.EventI;
 
 /**

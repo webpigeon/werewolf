@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.WolfGame;
-import uk.me.webpigeon.wolf.action.ActionI;
 
 public abstract class NewAction implements ActionI {
 	private Collection<GameState> permittedStates;

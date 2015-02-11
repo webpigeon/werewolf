@@ -3,11 +3,11 @@ package uk.me.webpigeon.wolf.newcode.legacy;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
-import uk.me.webpigeon.wolf.GameObserver;
 import uk.me.webpigeon.wolf.GameState;
-import uk.me.webpigeon.wolf.action.ActionI;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.*;
+import uk.me.webpigeon.wolf.newcode.legacy.players.GameObserver;
 
 public class LegacyWrapper implements Runnable, SessionManager {
 	private GameObserver player;

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import uk.me.webpigeon.wolf.action.AbstainAction;
-import uk.me.webpigeon.wolf.action.ActionI;
-import uk.me.webpigeon.wolf.action.EatAction;
-import uk.me.webpigeon.wolf.action.SeeAction;
+import uk.me.webpigeon.wolf.newcode.actions.AbstainAction;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.EatAction;
+import uk.me.webpigeon.wolf.newcode.actions.SeeAction;
 
 public class SeerRole extends AbstractRole {
 

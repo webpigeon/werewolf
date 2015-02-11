@@ -1,11 +1,11 @@
 package uk.me.webpigeon.wolf.newcode.legacy;
 
-import uk.me.webpigeon.wolf.CraftyWolfPlayer;
-import uk.me.webpigeon.wolf.GameObserver;
-import uk.me.webpigeon.wolf.WolfUtils;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
+import uk.me.webpigeon.wolf.newcode.actions.WolfUtils;
+import uk.me.webpigeon.wolf.newcode.legacy.players.CraftyWolfPlayer;
+import uk.me.webpigeon.wolf.newcode.legacy.players.GameObserver;
 
 public class LegacyUtils {
 	

@@ -3,9 +3,9 @@ package uk.me.webpigeon.wolf.gui;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
-import uk.me.webpigeon.wolf.action.ActionI;
 import uk.me.webpigeon.wolf.newcode.GameListener;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.ChatMessage;
 import uk.me.webpigeon.wolf.newcode.events.EventI;
 import uk.me.webpigeon.wolf.newcode.events.GameStarted;

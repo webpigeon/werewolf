@@ -1,8 +1,8 @@
-package uk.me.webpigeon.wolf;
+package uk.me.webpigeon.wolf.newcode.legacy.players;
 
 import java.util.Collection;
 
-import uk.me.webpigeon.wolf.action.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 
 public class NoopPlayer extends AbstractPlayer {
 	

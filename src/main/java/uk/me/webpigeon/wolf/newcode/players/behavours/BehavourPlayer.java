@@ -3,7 +3,7 @@ package uk.me.webpigeon.wolf.newcode.players.behavours;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.me.webpigeon.wolf.action.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 

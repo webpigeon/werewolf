@@ -1,11 +1,11 @@
-package uk.me.webpigeon.wolf;
+package uk.me.webpigeon.wolf.newcode.legacy.players;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import uk.me.webpigeon.wolf.action.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 
 public class RandomPlayer extends AbstractPlayer {
 

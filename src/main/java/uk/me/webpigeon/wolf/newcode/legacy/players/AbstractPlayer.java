@@ -1,4 +1,4 @@
-package uk.me.webpigeon.wolf;
+package uk.me.webpigeon.wolf.newcode.legacy.players;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,7 +9,11 @@ import java.util.TreeMap;
 
 import javax.swing.Timer;
 
-import uk.me.webpigeon.wolf.action.ActionI;
+import uk.me.webpigeon.wolf.GameController;
+import uk.me.webpigeon.wolf.GameState;
+import uk.me.webpigeon.wolf.PlayerController;
+import uk.me.webpigeon.wolf.RoleI;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 public abstract class AbstractPlayer implements ActionListener, GameObserver {
 	private static final Integer THINK_MULTIPLIER = 20;
 	private static final Integer MIN_THINK_TIME = 500;

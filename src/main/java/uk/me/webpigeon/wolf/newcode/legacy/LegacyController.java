@@ -8,9 +8,9 @@ import java.util.List;
 import uk.me.webpigeon.wolf.GameController;
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
-import uk.me.webpigeon.wolf.action.ActionI;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.actions.TalkAction;
 
 public class LegacyController implements GameController {

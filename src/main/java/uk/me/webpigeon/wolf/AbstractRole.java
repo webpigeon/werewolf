@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import uk.me.webpigeon.wolf.action.AbstainAction;
-import uk.me.webpigeon.wolf.action.ActionI;
-import uk.me.webpigeon.wolf.action.LynchAction;
+import uk.me.webpigeon.wolf.newcode.actions.AbstainAction;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.LynchAction;
 
 public class AbstractRole implements RoleI {
 	private String name;

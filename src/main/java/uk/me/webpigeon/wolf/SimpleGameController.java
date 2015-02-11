@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import uk.me.webpigeon.wolf.action.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
+import uk.me.webpigeon.wolf.newcode.legacy.players.GameObserver;
 
 public class SimpleGameController implements GameController {
 	private String name;

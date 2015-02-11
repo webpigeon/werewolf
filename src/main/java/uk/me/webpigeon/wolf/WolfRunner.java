@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import uk.me.webpigeon.wolf.newcode.actions.WolfUtils;
+import uk.me.webpigeon.wolf.newcode.legacy.players.BasicIntelligencePlayer;
+
 public class WolfRunner {
 
 	public static void main(String[] args) {

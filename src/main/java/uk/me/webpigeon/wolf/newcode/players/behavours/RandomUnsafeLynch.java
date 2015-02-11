@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import uk.me.webpigeon.wolf.action.ActionI;
-import uk.me.webpigeon.wolf.action.LynchAction;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
+import uk.me.webpigeon.wolf.newcode.actions.LynchAction;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 
 /**

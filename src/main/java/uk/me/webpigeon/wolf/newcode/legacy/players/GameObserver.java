@@ -1,4 +1,8 @@
-package uk.me.webpigeon.wolf;
+package uk.me.webpigeon.wolf.newcode.legacy.players;
+
+import uk.me.webpigeon.wolf.GameController;
+import uk.me.webpigeon.wolf.PlayerController;
+import uk.me.webpigeon.wolf.RoleI;
 
 public interface GameObserver {
 	

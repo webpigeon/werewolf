@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import uk.me.webpigeon.wolf.newcode.actions.WolfUtils;
+import uk.me.webpigeon.wolf.newcode.legacy.players.GameObserver;
+
 public class WolfGame implements Runnable {
 	private final Integer MIN_PLAYERS = 5;
 	

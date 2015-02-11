@@ -1,4 +1,4 @@
-package uk.me.webpigeon.wolf.action;
+package uk.me.webpigeon.wolf.newcode.actions;
 
 
 public class EatAction extends VoteAction {

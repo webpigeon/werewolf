@@ -1,9 +1,9 @@
 package uk.me.webpigeon.wolf.gui;
 
 import uk.me.webpigeon.wolf.GameController;
-import uk.me.webpigeon.wolf.GameObserver;
 import uk.me.webpigeon.wolf.PlayerController;
 import uk.me.webpigeon.wolf.RoleI;
+import uk.me.webpigeon.wolf.newcode.legacy.players.GameObserver;
 
 public class GraphicalObserver implements GameObserver {
 	private WolfFrame frame;

@@ -1,4 +1,4 @@
-package uk.me.webpigeon.wolf;
+package uk.me.webpigeon.wolf.newcode.legacy.players;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,7 +9,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import uk.me.webpigeon.wolf.action.ActionI;
+import uk.me.webpigeon.wolf.GameState;
+import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 
 public class CraftyWolfPlayer extends BasicIntelligencePlayer {
 	private Pattern messageRegex;

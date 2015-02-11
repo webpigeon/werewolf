@@ -2,10 +2,10 @@ package uk.me.webpigeon.wolf.gui;
 
 import java.util.List;
 
-import uk.me.webpigeon.wolf.BasicIntelligencePlayer;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.WolfGame;
-import uk.me.webpigeon.wolf.WolfUtils;
+import uk.me.webpigeon.wolf.newcode.actions.WolfUtils;
+import uk.me.webpigeon.wolf.newcode.legacy.players.BasicIntelligencePlayer;
 
 public class GraphicalWolf {
 	
