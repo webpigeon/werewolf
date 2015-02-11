@@ -12,11 +12,11 @@ public class WolfFactory {
 		WolfModel model = new WolfModel();
 		WolfController controller = new WolfController(model);
 
-		controller.addPlayer("Fred", LegacyUtils.buildSmartPlayer(controller, model));
+		controller.addPlayer("Fred", LegacyUtils.buildCraftyPlayer(controller, model));
 		controller.addPlayer("John", LegacyUtils.buildSmartPlayer(controller, model));
 		controller.addPlayer("Bob", LegacyUtils.buildSmartPlayer(controller, model));
-		controller.addPlayer("Wolfgang", LegacyUtils.buildSmartPlayer(controller, model));
-		controller.addPlayer("Pebbles", LegacyUtils.buildSmartPlayer(controller, model));
+		controller.addPlayer("Wolfgang", LegacyUtils.buildCraftyPlayer(controller, model));
+		controller.addPlayer("Pebbles", LegacyUtils.buildRandomPlayer(controller, model));
 		controller.addPlayer("Jackie", LegacyUtils.buildSmartPlayer(controller, model));
 		controller.addPlayer("Sarah", LegacyUtils.buildSmartPlayer(controller, model));
 		
