@@ -1,6 +1,6 @@
 package uk.me.webpigeon.wolf.newcode.actions;
 
-import uk.me.webpigeon.wolf.WolfGame;
+import uk.me.webpigeon.wolf.VoteService;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
 
@@ -12,14 +12,9 @@ public class AbstainAction implements ActionI {
 	}
 
 	@Override
-	public void execute(WolfGame game, String player) {
-		// TODO Auto-generated method stub	
-	}
-
-	@Override
 	public void execute(WolfController controller, WolfModel model) {
-		// TODO Auto-generated method stub
-		
+		VoteService service = controller.getVoteService();
+		//service.vote(voter, null);
 	}
 
 }

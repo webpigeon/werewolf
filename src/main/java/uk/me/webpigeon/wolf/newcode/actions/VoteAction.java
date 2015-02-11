@@ -1,7 +1,6 @@
 package uk.me.webpigeon.wolf.newcode.actions;
 
 import uk.me.webpigeon.wolf.VoteService;
-import uk.me.webpigeon.wolf.WolfGame;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfModel;
 
@@ -30,10 +29,6 @@ public abstract class VoteAction implements ActionI {
 		this.name = voter;
 		this.candidate = candidate;
 		this.publicVote = publicVote;
-	}
-	
-	public void execute(WolfGame game, String player) {
-		game.enterVote(player, candidate, publicVote);
 	}
 	
 	public boolean isTarget(String name) {

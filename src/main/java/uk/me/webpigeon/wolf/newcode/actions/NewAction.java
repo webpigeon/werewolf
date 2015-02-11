@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import uk.me.webpigeon.wolf.GameState;
-import uk.me.webpigeon.wolf.WolfGame;
 
 public abstract class NewAction implements ActionI {
 	private Collection<GameState> permittedStates;
@@ -21,11 +20,6 @@ public abstract class NewAction implements ActionI {
 	 */
 	protected boolean isPermittedState(GameState current) {
 		return permittedStates.contains(current);
-	}
-	
-	@Override
-	public final void execute(WolfGame game, String player) {
-		throw new RuntimeException("Incompatable action: new actions are only for new games");
 	}
 
 	@Override
