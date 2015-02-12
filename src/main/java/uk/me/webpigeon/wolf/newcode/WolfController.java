@@ -82,6 +82,8 @@ public class WolfController implements Runnable {
 		assert state == GameState.INIT;
 		this.state = GameState.STARTING;
 		
+		model.reset();
+		
 		Map<String, RoleI> roles = model.assignRoles(WolfUtils.buildRoleList(), WolfUtils.getDefaultRole());
 		
 		//notify players of their roles
@@ -110,29 +112,31 @@ public class WolfController implements Runnable {
 	
 	@Override
 	public void run() {
-		System.out.println("[debug] Starting game");
-		startGame();
-		
-		
-		System.out.println("[debug] Game started");
-		ActionWrapper wrapper = null;
-		do {
-			System.out.println("\t"+actions);
+		while (!Thread.interrupted()) {
+			System.out.println("[debug] Starting game");
+			startGame();
+				
+			System.out.println("[debug] Game started");
+			ActionWrapper wrapper = null;
+			do {				
+				if (wrapper != null) {
+					ActionI action = wrapper.action;
+					action.execute(wrapper.player, this, model);
+				}
+				
+				if (state != GameState.GAMEOVER) {
+					try {
+						wrapper = actions.take();
+					} catch (InterruptedException ex) {
+						System.err.println("interrupted!");
+						wrapper = null;
+					}
+				}
+				
+			} while (wrapper != null && state != GameState.GAMEOVER);
 			
-			if (wrapper != null) {
-				wrapper.action.execute(wrapper.player, this, model);
-			}
-			
-			try {
-				wrapper = actions.take();
-			} catch (InterruptedException ex) {
-				System.err.println("interrupted!");
-				wrapper = null;
-			}
-			
-		} while (wrapper != null && !Thread.interrupted());
-		
-		System.out.println("[debug] Game had ended");
+			System.out.println("[debug] Game had ended");
+		}
 	}
 
 	public GameState getState() {

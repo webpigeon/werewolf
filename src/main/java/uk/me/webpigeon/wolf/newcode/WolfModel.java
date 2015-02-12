@@ -13,11 +13,13 @@ import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.Team;
 
 public class WolfModel {
+	private Collection<String> otherPlayers;
 	private Collection<String> players;
 	private Map<String, RoleI> roleMapping;
 	private Map<Team, Collection<String>> teams;
 	
 	public WolfModel() {
+		this.otherPlayers = new ArrayList<String>();
 		this.players = new ArrayList<String>();
 		this.roleMapping = new TreeMap<String, RoleI>();
 		this.teams = new HashMap<Team, Collection<String>>();
@@ -25,6 +27,7 @@ public class WolfModel {
 
 	public void addPlayer(String player) {
 		players.add(player);
+		otherPlayers.add(player);
 	}
 	
 	public void removePlayer(String player) {
@@ -97,6 +100,13 @@ public class WolfModel {
 
 	public Collection<String> getWolves() {
 		return teams.get(Team.WOLVES);
+	}
+
+	public void reset() {
+		players.clear();
+		roleMapping.clear();
+		teams.clear();
+		players.addAll(otherPlayers);	
 	}
 
 }
