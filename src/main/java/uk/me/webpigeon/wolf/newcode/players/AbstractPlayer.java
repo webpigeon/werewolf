@@ -9,6 +9,7 @@ import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
+import uk.me.webpigeon.wolf.newcode.events.ChatMessage;
 import uk.me.webpigeon.wolf.newcode.events.EventI;
 import uk.me.webpigeon.wolf.newcode.events.GameStarted;
 import uk.me.webpigeon.wolf.newcode.events.PlayerDeath;
@@ -104,6 +105,10 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 				system.recordRole(pd.player, pd.role);
 				system.removePlayer(pd.player);
 				break;
+				
+			case "talk":
+				ChatMessage pc = (ChatMessage)event;
+				system.parseChat(pc);
 				
 			default:
 				System.out.println(event.getType());

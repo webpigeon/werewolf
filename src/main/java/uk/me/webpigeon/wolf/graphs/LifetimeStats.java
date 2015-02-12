@@ -19,18 +19,12 @@ public class LifetimeStats {
 		this.turnID = 0;
 	}
 
-	public void setDead(String player) {
-		List<Integer> deathTurns = deathTurn.get(player);
-		if (deathTurns == null) {
-			deathTurns = new ArrayList<Integer>();
-			deathTurn.put(player, deathTurns);
-		}
-		
-		deathTurns.add(turnID);
+	public synchronized void setDead(String player) {
+		recordTurn(player, turnID);
 		alivePlayers.remove(player);
 	}
 	
-	public void resetGame(Collection<String> players) {
+	public synchronized void resetGame(Collection<String> players) {
 		alivePlayers.clear();
 		alivePlayers.addAll(players);
 		turnID = 0;
@@ -42,6 +36,40 @@ public class LifetimeStats {
 
 	public Map<String, List<Integer>> getScores() {
 		return Collections.unmodifiableMap(deathTurn);
+	}
+	
+	public synchronized Map<String, Double> getAverageScore() {
+		
+		Map<String, Double> scores = new TreeMap<String, Double>();
+		for (String player : deathTurn.keySet()) {
+			double totals = 0;
+			List<Integer> turnList = deathTurn.get(player);
+			
+			for (Integer turn : turnList) {
+				totals += turn;
+			}
+			
+			scores.put(player, totals/turnList.size());
+		}
+		
+		return scores;
+	}
+
+	private void recordTurn(String player, int turn) {
+		List<Integer> deathTurns = deathTurn.get(player);
+		if (deathTurns == null) {
+			deathTurns = new ArrayList<Integer>();
+			deathTurn.put(player, deathTurns);
+		}
+		
+		deathTurns.add(turnID);
+	}
+	
+	public synchronized void gameOver(List<String> winners) {
+		for (String player : alivePlayers) {
+			recordTurn(player, turnID);
+		}
+		
 	}
 	
 }

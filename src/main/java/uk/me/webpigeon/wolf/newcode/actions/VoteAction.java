@@ -49,9 +49,9 @@ public abstract class VoteAction extends NewAction {
 					controller.broadcast(new PlayerVote(name, candidate));
 				}
 				
-				/*if (service.isFinished()) {
-					controller.addTask(new AdvanceTurn());
-				}*/
+				if (service.isFinished()) {
+					//controller.addTask(null, new AdvanceTurn());
+				}
 			}
 		}
 	}

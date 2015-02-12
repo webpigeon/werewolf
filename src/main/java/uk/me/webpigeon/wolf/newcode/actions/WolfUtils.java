@@ -31,7 +31,7 @@ public class WolfUtils {
 		RoleI wolf = new WolfRole();
 		RoleI seer = new SeerRole();
 		
-		return Arrays.asList(wolf, seer);
+		return Arrays.asList(wolf, wolf, seer);
 	}
 
 	public static RoleI getDefaultRole() {

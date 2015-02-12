@@ -1,6 +1,7 @@
 package uk.me.webpigeon.wolf.graphs;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Queue;
 
 import uk.me.webpigeon.wolf.GameState;
@@ -29,11 +30,13 @@ public class StatsTracker implements GameListener {
 	@Override
 	public void onStateChange(GameState newState) {
 		if (newState == GameState.DAYTIME || newState == GameState.NIGHTTIME) {
-			System.out.printf("[TURN] Turn changed, it is now %s\n", newState);
+			//System.out.printf("[TURN] Turn changed, it is now %s\n", newState);
 			stats.incrementTurn();
 		} else if (newState == GameState.GAMEOVER) {
+			stats.gameOver(Collections.emptyList());
+			
 			//TODO reward players for surviving till the end
-			System.out.println("game over: "+stats.getScores());
+			System.out.println("game over: "+stats.getAverageScore());
 		}
 		
 	}
@@ -41,24 +44,24 @@ public class StatsTracker implements GameListener {
 	@Override
 	public void onGameStart(Collection<String> players) {
 		stats.resetGame(players);
-		System.out.println("game started: "+players);
+		//System.out.println("game started: "+players);
 	}
 
 	@Override
 	public void onMessage(String player, String message, String channel) {
 		// TODO Auto-generated method stub
-		System.out.printf("[MSG] <%s> %s\n", player, message);
+		//System.out.printf("[MSG] <%s> %s\n", player, message);
 	}
 
 	@Override
 	public void onVoteEntered(String voter, String candidate) {
-		System.out.printf("[VOTE] %s voted for %s\n", voter, candidate);
+		//System.out.printf("[VOTE] %s voted for %s\n", voter, candidate);
 	}
 
 	@Override
 	public void onDeath(String player, String cause, String role) {
 		stats.setDead(player);
-		System.out.printf("[DEATH] %s died of %s, they were a %s\n", player, cause, role);
+		//System.out.printf("[DEATH] %s died of %s, they were a %s\n", player, cause, role);
 	}
 
 }

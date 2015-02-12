@@ -270,7 +270,6 @@ public class BasicIntelligencePlayer extends AbstractPlayer {
 
 	@Override
 	protected void clearTurnLocks() {
-		System.out.println(getName()+" cleaned current action "+controller.getStage());
 		currentAction = null;
 	}
 	

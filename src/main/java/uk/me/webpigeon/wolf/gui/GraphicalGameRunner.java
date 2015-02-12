@@ -1,5 +1,6 @@
 package uk.me.webpigeon.wolf.gui;
 
+import uk.me.webpigeon.wolf.newcode.Event2Listener;
 import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.WolfFactory;
 
