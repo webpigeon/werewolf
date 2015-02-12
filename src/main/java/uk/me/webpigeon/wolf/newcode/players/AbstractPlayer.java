@@ -76,6 +76,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 	private void processEvent(EventI event) {
 		switch(event.getType()) {
 			case "gameStarted":
+				system.clear();
 				GameStarted gs = (GameStarted)event;
 				system.setPlayers(gs.players);
 				break;
@@ -115,6 +116,10 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 
 	public boolean isRole(String role) {
 		return role.equals(this.role.getName());
+	}
+
+	public String getName() {
+		return name;
 	}
 	
 }

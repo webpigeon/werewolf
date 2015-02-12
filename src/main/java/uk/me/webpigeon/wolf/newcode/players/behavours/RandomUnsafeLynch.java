@@ -1,6 +1,7 @@
 package uk.me.webpigeon.wolf.newcode.players.behavours;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -20,29 +21,38 @@ public class RandomUnsafeLynch implements Behavour {
 	public RandomUnsafeLynch() {
 		this.random = new Random();
 	}
-
-	@Override
-	public boolean canActivate(AbstractPlayer player, BeliefSystem myPlayer, ActionI a) {
-		return a == null && player.isState(GameState.DAYTIME);
-	}
-
-	@Override
-	public ActionI generateAction(AbstractPlayer player1, BeliefSystem myPlayer) {
+	
+	private List<String> getTargets(String name, BeliefSystem beliefs) {
+		System.out.println("beliefs "+beliefs.getPlayers());
 		
 		List<String> unsafePlayers = new ArrayList<String>();
-		for (String player : myPlayer.getPlayers() ) {
-			String role = myPlayer.getRole(player);
+		for (String player : beliefs.getPlayers() ) {
+			String role = beliefs.getRole(player);
 			
-			if (isUnsafe(role)) {
+			if (isUnsafe(role) && !player.equals(name)) {
 				unsafePlayers.add(player);
 			}
 		}
+		return unsafePlayers;
+	}
+
+	@Override
+	public boolean canActivate(AbstractPlayer player, BeliefSystem myPlayer, ActionI a) {
+		Collection<String> targets = getTargets(player.getName() ,myPlayer);
+		return a == null && player.isState(GameState.DAYTIME) && !targets.isEmpty();
+	}
+
+	@Override
+	public ActionI generateAction(AbstractPlayer player, BeliefSystem myPlayer) {
 		
-		if (unsafePlayers.isEmpty()) {
+		List<String> targets = getTargets(player.getName(), myPlayer);
+		if (targets.isEmpty()) {
 			return null;
 		}
 		
-		String choice = unsafePlayers.get(random.nextInt(unsafePlayers.size()));
+		System.out.println(targets);
+		
+		String choice = targets.get(random.nextInt(targets.size()));
 		return new LynchAction(choice);
 	}
 	
