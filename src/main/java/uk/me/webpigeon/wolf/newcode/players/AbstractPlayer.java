@@ -11,6 +11,8 @@ import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.EventI;
 import uk.me.webpigeon.wolf.newcode.events.GameStarted;
+import uk.me.webpigeon.wolf.newcode.events.PlayerDeath;
+import uk.me.webpigeon.wolf.newcode.events.PlayerRole;
 import uk.me.webpigeon.wolf.newcode.events.PlayerVote;
 import uk.me.webpigeon.wolf.newcode.events.StateChanged;
 
@@ -20,6 +22,8 @@ import uk.me.webpigeon.wolf.newcode.events.StateChanged;
 public abstract class AbstractPlayer implements Runnable, SessionManager {
 	
 	private String name;
+	private RoleI role;
+	
 	private WolfController controller;
 	private BlockingQueue<EventI> eventQueue;
 	private GameState state;
@@ -42,6 +46,13 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 	public void run() {
 		
 		while (!Thread.interrupted()) {
+			if (eventQueue == null) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 			
 			try {
 				EventI event = eventQueue.take();
@@ -51,10 +62,12 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 				e.printStackTrace();
 			}
 				
-			ActionI action = selectAction(system);
-			if (action != null && !action.equals(currentAction)) {
-				controller.addTask(name, action);
-				currentAction = action;
+			if (state == GameState.DAYTIME || state == GameState.NIGHTTIME) {
+				ActionI action = selectAction(system);
+				if (action != null && !action.equals(currentAction)) {
+					controller.addTask(name, action);
+					currentAction = action;
+				}
 			}
 		}
 		
@@ -70,15 +83,38 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 			case "stateChange":
 				StateChanged sc = (StateChanged)event;
 				state = sc.newState;
+				currentAction = null;
 				break;
 				
 			case "vote":
 				PlayerVote pv = (PlayerVote)event;
+				//system.recordRole(pv.player, pv.vote);
+				break;
+				
+			case "role":
+				PlayerRole pr = (PlayerRole)event;
+				if (name.equals(pr.name)){
+					role = pr.role;
+				}
 				break;
 		
+			case "death":
+				PlayerDeath pd = (PlayerDeath)event;
+				system.recordRole(pd.player, pd.role);
+				system.removePlayer(pd.player);
+				break;
+				
 			default:
 				System.out.println(event.getType());
 		}
+	}
+
+	public boolean isState(GameState state) {
+		return this.state.equals(state);
+	}
+
+	public boolean isRole(String role) {
+		return role.equals(this.role.getName());
 	}
 	
 }

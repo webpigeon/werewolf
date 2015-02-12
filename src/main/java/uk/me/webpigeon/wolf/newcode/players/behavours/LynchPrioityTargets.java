@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.actions.LynchAction;
+import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 
 /**
@@ -20,7 +22,11 @@ public class LynchPrioityTargets implements Behavour {
 	}
 
 	@Override
-	public boolean canActivate(BeliefSystem myPlayer, ActionI a) {
+	public boolean canActivate(AbstractPlayer player1, BeliefSystem myPlayer, ActionI a) {
+		
+		if (!player1.isState(GameState.DAYTIME)){
+			return false;
+		}
 		
 		List<String> targets = new ArrayList<String>();
 		for (String player : myPlayer.getPlayers()) {
@@ -41,7 +47,7 @@ public class LynchPrioityTargets implements Behavour {
 	}
 
 	@Override
-	public ActionI generateAction(BeliefSystem myPlayer) {
+	public ActionI generateAction(AbstractPlayer player1, BeliefSystem myPlayer) {
 		
 		List<String> targets = new ArrayList<String>();
 		for (String player : myPlayer.getPlayers()) {

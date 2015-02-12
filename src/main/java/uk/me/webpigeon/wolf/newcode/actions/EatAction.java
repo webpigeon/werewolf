@@ -19,6 +19,10 @@ public class EatAction extends VoteAction {
 			return false;
 		}
 		
+		if (!model.isAlivePlayer(name)) {
+			return false;
+		}
+		
 		RoleI role = model.getRole(name);
 		if (!"wolf".equals(role.getName())){
 			System.err.println("[BUG] "+name+" has turned into canniabal");
