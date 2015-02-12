@@ -22,9 +22,7 @@ public class RandomUnsafeLynch implements Behavour {
 		this.random = new Random();
 	}
 	
-	private List<String> getTargets(String name, BeliefSystem beliefs) {
-		System.out.println("beliefs "+beliefs.getPlayers());
-		
+	private List<String> getTargets(String name, BeliefSystem beliefs) {		
 		List<String> unsafePlayers = new ArrayList<String>();
 		for (String player : beliefs.getPlayers() ) {
 			String role = beliefs.getRole(player);
@@ -49,8 +47,6 @@ public class RandomUnsafeLynch implements Behavour {
 		if (targets.isEmpty()) {
 			return null;
 		}
-		
-		System.out.println(targets);
 		
 		String choice = targets.get(random.nextInt(targets.size()));
 		return new LynchAction(choice);

@@ -20,6 +20,10 @@ public class GameTimer implements GameListener {
 		this.timer = new Timer(TURN_TIME_LIMIT, new TimeoutTask(controller));
 	}
 	
+	public GameTimer(Integer turnLimit, WolfController controller) {
+		this.timer = new Timer(turnLimit, new TimeoutTask(controller));
+	}
+	
 	@Override
 	public void onStateChange(GameState newState) {
 		if (newState == GameState.DAYTIME || newState == GameState.NIGHTTIME) {

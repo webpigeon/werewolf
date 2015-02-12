@@ -1,5 +1,6 @@
 package uk.me.webpigeon.wolf.newcode;
 
+import uk.me.webpigeon.wolf.gui.Event2Listener;
 import uk.me.webpigeon.wolf.newcode.legacy.LegacyUtils;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.behavours.BehavourPlayer;
@@ -40,6 +41,16 @@ public class WolfFactory {
 		t.start();
 		
 		return player;
+	}
+	
+	public static SessionManager wrap(String threadName, GameListener listener) {
+		Event2Listener event = new Event2Listener(listener);
+		
+		Thread t = new Thread(event);
+		t.setName(threadName);
+		t.start();
+		
+		return event;
 	}
 
 }
