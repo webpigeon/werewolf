@@ -9,6 +9,7 @@ import uk.me.webpigeon.wolf.newcode.players.behavours.EatSomeone;
 import uk.me.webpigeon.wolf.newcode.players.behavours.LieAboutRole;
 import uk.me.webpigeon.wolf.newcode.players.behavours.LynchPrioityTargets;
 import uk.me.webpigeon.wolf.newcode.players.behavours.RandomUnsafeLynch;
+import uk.me.webpigeon.wolf.newcode.players.behavours.SeerSavingAnnounce;
 
 public class WolfFactory {
 	
@@ -34,6 +35,7 @@ public class WolfFactory {
 	
 	public static SessionManager buildBehavourPlayer() {
 		BehavourPlayer player = new BehavourPlayer();
+		player.addBehavour(new SeerSavingAnnounce());
 		player.addBehavour(new DebugAnnounceRole());
 		player.addBehavour(new LieAboutRole());
 		player.addBehavour(new EatSomeone());

@@ -14,8 +14,8 @@ import uk.me.webpigeon.wolf.newcode.events.ChatMessage;
 public class BeliefSystem {
 	private final Collection<String> alivePlayers;
 	private final Map<String, String> roles;
+	private final Map<String, Integer> votes;
 	private final Map<String, Double> trust;
-	private final Map<String, List<Tripple>> tripples;
 	private final Pattern chatPattern;
 	
 	public String name;
@@ -24,8 +24,8 @@ public class BeliefSystem {
 		this.chatPattern = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
 		this.alivePlayers = new ArrayList<String>();
 		this.roles = new TreeMap<String, String>();
+		this.votes = new TreeMap<String, Integer>();
 		this.trust = new TreeMap<String, Double>();
-		this.tripples = new TreeMap<>();
 	}
 	
 	/**
@@ -65,39 +65,9 @@ public class BeliefSystem {
 	}
 	
 	public void recordInfomation(String player, Tripple fact) {
-		List<Tripple> trippleList = tripples.get(player);
-		if (trippleList == null) {
-			trippleList = new ArrayList<Tripple>();
-			tripples.put(player, trippleList);
-		}
-		
-		trippleList.add(fact);
-		checkFacts();
 	}
 	
-	private void checkFacts() {
-		
-		for (Map.Entry<String, List<Tripple>> factList : tripples.entrySet()) {
-			String player = factList.getKey();
-			List<Tripple> tripples = factList.getValue();
-			
-			for (Tripple tripple : tripples) {
-				
-				System.out.println(roles);
-				if ("role".equals(tripple.verb)) {
-					String currentRole = roles.get(tripple.object);
-					
-					if (currentRole != null && !currentRole.equals(tripple.subject)) {
-						System.out.println("Warning! conflict on "+tripple+" was "+currentRole);
-						changeTrust(player, -0.1);
-					}
-					
-				}
-				
-			}
-		}
-		
-	}
+
 	
 	/**
 	 * mark a player as dead
@@ -202,6 +172,18 @@ public class BeliefSystem {
 	public String getMyName() {
 		return name;
 	}
+
+	public void cleanVotes() {
+		votes.clear();
+	}
+	
+	public void registerVote(String name) {
+		Integer currentCount = votes.get(name);
+		if (currentCount == null) {
+			currentCount = 0;
+		}
+		votes.put(name, currentCount + 1);
+	}
 	
 	public void changeTrust(String player, double delta) {
 		Double trustValue = trust.get(player);
@@ -210,6 +192,15 @@ public class BeliefSystem {
 		}
 		
 		trust.put(player, trustValue + delta);
+	}
+
+	public int getVotesFor(String name) {
+		if (name == null) {
+			return 0;
+		}
+		
+		Integer voteCount = votes.get(name);
+		return voteCount==null?0:voteCount;
 	}
 	
 }

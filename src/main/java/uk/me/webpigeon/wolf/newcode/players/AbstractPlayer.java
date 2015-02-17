@@ -94,6 +94,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 				
 			case "vote":
 				PlayerVote pv = (PlayerVote)event;
+				system.registerVote(pv.vote);
 				//system.recordRole(pv.player, pv.vote);
 				break;
 				
@@ -135,6 +136,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 	
 	protected void clearBlocks() {
 		currentAction = null;
+		system.cleanVotes();
 	}
 	
 }
