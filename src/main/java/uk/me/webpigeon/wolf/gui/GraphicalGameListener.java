@@ -10,6 +10,7 @@ import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.newcode.GameListener;
 import uk.me.webpigeon.wolf.newcode.SessionManager;
+import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.events.EventI;
 
@@ -28,7 +29,7 @@ public class GraphicalGameListener implements GameListener {
 	}
 
 	@Override
-	public void onJoin(String name, Queue<ActionI> actionQueue) {
+	public void onJoin(String name, WolfController controller) {
 		throw new RuntimeException("Graphical listener joined the game?!");
 	}
 
@@ -70,12 +71,12 @@ public class GraphicalGameListener implements GameListener {
 		controller.setPlayers(playerList);
 		
 		if ("eat".equals(cause)) {
-			controller.appendText("The villagers discover the remains of <b>" +player+"</b> who has been eaten by a wolf. They turn out to be a <b>"+role+"</b>. The villagers morn the loss.");
+			controller.printMessage("The villagers discover the remains of <b>" +player+"</b> who has been eaten by a wolf. They turn out to be a <b>"+role+"</b>. The villagers morn the loss.");
 			return;
 		}
 		
 		if ("lynch".equals(cause)) {
-			controller.appendText("Against "+player+"'s protests, the villagers string them up and lynch them. They turn out to be a <b>"+role+"</b>");
+			controller.printMessage("Against "+player+"'s protests, the villagers string them up and lynch them. They turn out to be a <b>"+role+"</b>");
 			return;
 		}
 	}

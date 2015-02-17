@@ -7,6 +7,7 @@ import java.util.Queue;
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.newcode.GameListener;
+import uk.me.webpigeon.wolf.newcode.WolfController;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 
 public class StatsTracker implements GameListener {
@@ -23,7 +24,7 @@ public class StatsTracker implements GameListener {
 	}
 
 	@Override
-	public void onJoin(String name, Queue<ActionI> actionQueue) {
+	public void onJoin(String name, WolfController controller) {
 		
 	}
 

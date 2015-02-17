@@ -5,6 +5,7 @@ import java.util.Queue;
 
 import javax.swing.Timer;
 
+import uk.me.webpigeon.wolf.GameController;
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.newcode.GameListener;
@@ -40,12 +41,6 @@ public class GameTimer implements GameListener {
 	}
 
 	@Override
-	public void onJoin(String name, Queue<ActionI> actionQueue) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void onDiscoverRole(String player, RoleI role) {
 		// TODO Auto-generated method stub
 		
@@ -65,6 +60,12 @@ public class GameTimer implements GameListener {
 
 	@Override
 	public void onVoteEntered(String voter, String candidate) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onJoin(String name, WolfController controller) {
 		// TODO Auto-generated method stub
 		
 	}

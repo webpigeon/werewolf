@@ -20,13 +20,13 @@ import javax.swing.text.html.HTMLEditorKit;
 public class WolfFrame {
 	private JFrame frame;
 	private DefaultListModel<String> players;
-	private DefaultBoundedRangeModel progressBarModel;
+	private InteractivePanel panel;
+	private GameLog log;
 	
-	private HTMLEditorKit kit;
-	private HTMLDocument document;
 	
-	public WolfFrame() {
+	public WolfFrame(InteractivePanel panel) {
 		frame = new JFrame();
+		this.panel = panel;
 		initGUI();
 	}
 	
@@ -36,27 +36,19 @@ public class WolfFrame {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(800, 600));
 		
-		progressBarModel = new DefaultBoundedRangeModel();
-		JProgressBar progressBar = new JProgressBar(progressBarModel);
-		frame.add(progressBar, BorderLayout.NORTH);
-		
 		players = new DefaultListModel<String>();
 		JList<String> playerList = new JList<String>(players);
 		
-		kit = new HTMLEditorKit();
-		document = (HTMLDocument)kit.createDefaultDocument();
-		JTextPane console = new JTextPane();
-		console.setEditable(false);
-		console.setEditorKit(kit);
-		console.setDocument(document);
+		log = new GameLog();
 		
-		//console.setEditable(false);
-		
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, playerList, console);
-		splitPane.add(new JScrollPane(console));
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane.setLeftComponent(playerList);
+		splitPane.setRightComponent(log.getComponent());
 		splitPane.setResizeWeight(0.20);
 		
 		frame.add(splitPane, BorderLayout.CENTER);
+		
+		frame.add(panel.getComponent(), BorderLayout.SOUTH);
 	}
 
 	public void setPlayers(Collection<String> alivePlayers) {
@@ -66,34 +58,24 @@ public class WolfFrame {
 		}
 	}
 	
-	public void appendText(String text) {
-		try {
-			kit.insertHTML(document, document.getLength(), text, 0, 0, null);
-		} catch (IOException | BadLocationException ex) {
-			System.err.println(ex);
-		}
-	}
-	
 	public void start() {
 		frame.pack();
 		frame.setVisible(true);
 	}
-
-	public void notifyTicks(int roundTicksLeft, Integer ticksPerRound) {	
-		progressBarModel.setMinimum(0);
-		progressBarModel.setMaximum(ticksPerRound);
-		progressBarModel.setValue(ticksPerRound - roundTicksLeft);
+	
+	public void printMessage(String message) {
+		log.appendText(message);
 	}
 	
 	public void printContext(String message) {
-		appendText("<i>["+message+"]</i>");
+		log.appendText("<i>["+message+"]</i>");
 	}
 	
 	public void printNarrative(String message) {
-		appendText("<i>"+message+"</i>");
+		log.appendText("<i>"+message+"</i>");
 	}
 
 	public void printMessage(String player, String message) {
-		appendText("&lt;<b>"+player+"</b>&gt; "+message);
+		log.appendText("&lt;<b>"+player+"</b>&gt; "+message);
 	}
 }
