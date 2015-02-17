@@ -3,6 +3,6 @@
   <groupId>uk.me.webpigeon.wolf</groupId>
   <artifactId>ai-wolfgame</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>Warewolf</name>
-  <description>An NPC version of the IRC game warewolf</description>
+  <name>Werewolf</name>
+  <description>An NPC version of the IRC game werewolf</description>
 </project>
