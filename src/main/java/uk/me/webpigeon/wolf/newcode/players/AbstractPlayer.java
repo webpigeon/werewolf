@@ -40,6 +40,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 		this.name = name;
 		this.controller = controller;
 		this.eventQueue = eventQueue;
+		system.setPlayerName(name);
 	}
 	
 	public abstract ActionI selectAction(BeliefSystem system);
@@ -95,6 +96,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 				
 			case "role":
 				PlayerRole pr = (PlayerRole)event;
+				system.recordRole(pr.name, pr.role.getName());
 				if (name.equals(pr.name)){
 					role = pr.role;
 				}
@@ -106,12 +108,13 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 				system.removePlayer(pd.player);
 				break;
 				
-			case "talk":
+			case "chat":
 				ChatMessage pc = (ChatMessage)event;
 				system.parseChat(pc);
+				break;
 				
 			default:
-				System.out.println(event.getType());
+				System.err.println("unknown event "+event.getType());
 		}
 	}
 

@@ -14,6 +14,8 @@ public class BeliefSystem {
 	private final Collection<String> alivePlayers;
 	private final Map<String, String> roles;
 	private final Pattern chatPattern;
+	
+	public String name;
 
 	public BeliefSystem() {
 		this.chatPattern = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
@@ -33,6 +35,10 @@ public class BeliefSystem {
 			alivePlayers.clear();
 		}
 		alivePlayers.addAll(players);
+	}
+	
+	void setPlayerName(String name) {
+		this.name = name;
 	}
 	
 	/**
@@ -73,13 +79,17 @@ public class BeliefSystem {
 
 	public void parseChat(ChatMessage pc) {
 		Matcher m = chatPattern.matcher(pc.message);
-		if (m.matches()) {
-			Tripple t = new Tripple();
-			t.object = m.group(1);
-			t.verb = m.group(2);
-			t.subject = m.group(3);
-			
-			System.out.println(t);
+		if (!m.matches()) {
+			return;
+		}
+		
+		Tripple t = new Tripple();
+		t.object = m.group(1);
+		t.verb = m.group(2);
+		t.subject = m.group(3);
+
+		if ("role".equals(t.verb)) {
+			roles.put(t.object, t.subject);
 		}
 	}
 	
@@ -141,6 +151,14 @@ public class BeliefSystem {
 		private BeliefSystem getOuterType() {
 			return BeliefSystem.this;
 		}
+	}
+
+	public boolean isAlive(String target) {
+		return alivePlayers.contains(target);
+	}
+	
+	public String getMyName() {
+		return name;
 	}
 	
 }
