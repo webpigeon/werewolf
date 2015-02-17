@@ -3,6 +3,7 @@ package uk.me.webpigeon.wolf.newcode.players;
 import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
@@ -57,20 +58,24 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 			}
 			
 			try {
-				EventI event = eventQueue.take();
-				processEvent(event);
+				EventI event = eventQueue.poll(5, TimeUnit.SECONDS);
+				if (event != null) {
+					processEvent(event);
+				}
+				
+				if (state == GameState.DAYTIME || state == GameState.NIGHTTIME) {
+					ActionI action = selectAction(system);
+					if (action != null && !action.equals(currentAction)) {
+						controller.addTask(name, action);
+						currentAction = action;
+					}
+				}
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-				
-			if (state == GameState.DAYTIME || state == GameState.NIGHTTIME) {
-				ActionI action = selectAction(system);
-				if (action != null && !action.equals(currentAction)) {
-					controller.addTask(name, action);
-					currentAction = action;
-				}
-			}
+
 		}
 		
 	}

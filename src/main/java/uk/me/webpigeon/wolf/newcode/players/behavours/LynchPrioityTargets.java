@@ -24,7 +24,7 @@ public class LynchPrioityTargets implements Behavour {
 	public LynchPrioityTargets(String ourRole, String ... targetRoles) {
 		
 		this.scores = new TreeMap<>();
-		this.targetMap = new TreeMap<>();
+		this.targetMap = null;
 		
 		int scoreCount = 0;
 		for (String targetRole : targetRoles) {
@@ -41,7 +41,8 @@ public class LynchPrioityTargets implements Behavour {
 			return false;
 		}
 		
-		return buildTargetMap(myPlayer);
+		buildTargetMap(myPlayer);
+		return !targetMap.isEmpty();
 	}
 
 	@Override
@@ -51,7 +52,9 @@ public class LynchPrioityTargets implements Behavour {
 		}
 		
 		// I'm hoping the order of entryset is defined for an ordered map, else I'll be sad.
+		System.out.println("My target list is: "+targetMap);
 		for (Map.Entry<Integer, List<String>> targetsEntry : targetMap.entrySet()) {
+			
 			List<String> targets = targetsEntry.getValue();
 			if (targets.isEmpty()) {
 				continue;
@@ -71,11 +74,10 @@ public class LynchPrioityTargets implements Behavour {
 		return null;
 	}
 	
-	private boolean buildTargetMap(BeliefSystem beliefs) {
+	private void buildTargetMap(BeliefSystem beliefs) {
 		targetMap = new TreeMap<>();
 		
-		List<String> players = new ArrayList<String>();
-		for (String player : players) {
+		for (String player : beliefs.getPlayers()) {
 			
 			String role = beliefs.getRole(player);
 			if (role == null) {
@@ -87,13 +89,12 @@ public class LynchPrioityTargets implements Behavour {
 				List<String> playerList = targetMap.get(score);
 				if (playerList == null) {
 					playerList = new ArrayList<String>();
+					targetMap.put(score, playerList);
 				}
 				playerList.add(player);
 			}
 			
 		}
-		
-		return targetMap.isEmpty();
 	}
 
 }
