@@ -84,16 +84,6 @@ public class WolfController implements Runnable {
 		
 		model.reset();
 		
-		Map<String, RoleI> roles = model.assignRoles(WolfUtils.buildRoleList(), WolfUtils.getDefaultRole());
-		
-		//notify players of their roles
-		for (Map.Entry<String, RoleI> entry : roles.entrySet()) {
-			String player = entry.getKey();
-			RoleI role = entry.getValue();
-			
-			unicast(player, new PlayerRole(player, role));
-		}
-		
 		addTask(new StartGame());
 	}
 	
