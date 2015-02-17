@@ -81,6 +81,10 @@ public class Event2Listener implements Runnable, SessionManager {
 	public void bind(String name, WolfController controller, BlockingQueue<EventI> eventQueue) {
 		this.eventQueue = eventQueue;
 		new Thread(this).start();
+		
+		if (name != null) {
+			listener.onJoin(name, controller);
+		}
 	}
 
 }
