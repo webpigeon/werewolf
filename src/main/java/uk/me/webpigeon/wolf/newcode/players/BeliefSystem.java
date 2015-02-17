@@ -3,6 +3,7 @@ package uk.me.webpigeon.wolf.newcode.players;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -13,6 +14,8 @@ import uk.me.webpigeon.wolf.newcode.events.ChatMessage;
 public class BeliefSystem {
 	private final Collection<String> alivePlayers;
 	private final Map<String, String> roles;
+	private final Map<String, Double> trust;
+	private final Map<String, List<Tripple>> tripples;
 	private final Pattern chatPattern;
 	
 	public String name;
@@ -21,6 +24,8 @@ public class BeliefSystem {
 		this.chatPattern = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
 		this.alivePlayers = new ArrayList<String>();
 		this.roles = new TreeMap<String, String>();
+		this.trust = new TreeMap<String, Double>();
+		this.tripples = new TreeMap<>();
 	}
 	
 	/**
@@ -59,6 +64,41 @@ public class BeliefSystem {
 		roles.put(player, role);
 	}
 	
+	public void recordInfomation(String player, Tripple fact) {
+		List<Tripple> trippleList = tripples.get(player);
+		if (trippleList == null) {
+			trippleList = new ArrayList<Tripple>();
+			tripples.put(player, trippleList);
+		}
+		
+		trippleList.add(fact);
+		checkFacts();
+	}
+	
+	private void checkFacts() {
+		
+		for (Map.Entry<String, List<Tripple>> factList : tripples.entrySet()) {
+			String player = factList.getKey();
+			List<Tripple> tripples = factList.getValue();
+			
+			for (Tripple tripple : tripples) {
+				
+				System.out.println(roles);
+				if ("role".equals(tripple.verb)) {
+					String currentRole = roles.get(tripple.object);
+					
+					if (currentRole != null && !currentRole.equals(tripple.subject)) {
+						System.out.println("Warning! conflict on "+tripple+" was "+currentRole);
+						changeTrust(player, -0.1);
+					}
+					
+				}
+				
+			}
+		}
+		
+	}
+	
 	/**
 	 * mark a player as dead
 	 * @param player the player to remove
@@ -91,6 +131,8 @@ public class BeliefSystem {
 		if ("role".equals(t.verb)) {
 			roles.put(t.object, t.subject);
 		}
+		
+		recordInfomation(pc.message, t);
 	}
 	
 	private class Tripple {
@@ -159,6 +201,15 @@ public class BeliefSystem {
 	
 	public String getMyName() {
 		return name;
+	}
+	
+	public void changeTrust(String player, double delta) {
+		Double trustValue = trust.get(player);
+		if (trustValue == null) {
+			trustValue = 0.0;
+		}
+		
+		trust.put(player, trustValue + delta);
 	}
 	
 }

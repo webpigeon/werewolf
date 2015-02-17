@@ -52,10 +52,10 @@ public class WolfFrame {
 	}
 
 	public void setPlayers(Collection<String> alivePlayers) {
-		players.clear();
-		for (String player : alivePlayers) {
-			players.add(0, player);
-		}
+		//players.clear();
+		//for (String player : alivePlayers) {
+		//	players.add(0, player);
+		//}
 	}
 	
 	public void start() {

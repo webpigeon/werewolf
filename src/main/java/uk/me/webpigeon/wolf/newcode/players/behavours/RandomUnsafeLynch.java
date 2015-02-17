@@ -31,7 +31,7 @@ public class RandomUnsafeLynch implements Behavour {
 		
 		Collection<String> targets = getTargets(player.getName(), myPlayer);
 		
-		if (setBy.equals(getID())) {
+		if (setBy != null && setBy.equals(getID())) {
 			//if we set the target, make sure the target is still valid
 			return !targets.contains(choice);
 		}
