@@ -1,7 +1,5 @@
 package uk.me.webpigeon.wolf.newcode.players;
 
-import java.util.Collection;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -91,7 +89,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 			case "stateChange":
 				StateChanged sc = (StateChanged)event;
 				state = sc.newState;
-				currentAction = null;
+				clearBlocks();
 				break;
 				
 			case "vote":
@@ -133,6 +131,10 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 
 	public String getName() {
 		return name;
+	}
+	
+	protected void clearBlocks() {
+		currentAction = null;
 	}
 	
 }

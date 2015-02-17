@@ -34,8 +34,12 @@ public class LynchPrioityTargets implements Behavour {
 		this.ourRole = ourRole;
 	}
 
+	public String getID(){
+		return "LynchPrioityTargets";
+	}
+	
 	@Override
-	public boolean canActivate(AbstractPlayer player1, BeliefSystem myPlayer, ActionI a) {
+	public boolean canActivate(AbstractPlayer player1, BeliefSystem myPlayer, String setBy) {
 		
 		if (!player1.isState(GameState.DAYTIME) || !player1.isRole(ourRole) ){
 			return false;
@@ -52,7 +56,6 @@ public class LynchPrioityTargets implements Behavour {
 		}
 		
 		// I'm hoping the order of entryset is defined for an ordered map, else I'll be sad.
-		System.out.println("My target list is: "+targetMap);
 		for (Map.Entry<Integer, List<String>> targetsEntry : targetMap.entrySet()) {
 			
 			List<String> targets = targetsEntry.getValue();

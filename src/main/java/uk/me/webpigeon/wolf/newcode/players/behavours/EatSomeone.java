@@ -22,14 +22,13 @@ public class EatSomeone implements Behavour {
 		this.random = new Random();
 	}
 
+	public String getID(){
+		return "EatSomeone";
+	}
+	
 	@Override
-	public boolean canActivate(AbstractPlayer player1, BeliefSystem myPlayer, ActionI a) {
-		
-		if (!player1.isState(GameState.NIGHTTIME) || !player1.isRole("wolf")){
-			return false;
-		} else {
-			return true;
-		}
+	public boolean canActivate(AbstractPlayer player, BeliefSystem myPlayer, String setBy) {
+		return player.isState(GameState.NIGHTTIME) && player.isRole("wolf") && !"EatSomeone".equals(setBy);
 	}
 
 	@Override

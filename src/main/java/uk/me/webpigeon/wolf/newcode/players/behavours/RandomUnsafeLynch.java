@@ -16,9 +16,49 @@ import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
  */
 public class RandomUnsafeLynch implements Behavour {
 	private Random random;
+	private String choice;
 	
 	public RandomUnsafeLynch() {
 		this.random = new Random();
+	}
+
+	@Override
+	public boolean canActivate(AbstractPlayer player, BeliefSystem myPlayer, String setBy) {
+		if (!player.isState(GameState.DAYTIME)) {
+			// we can only lynch during the daytime
+			return false;
+		}
+		
+		Collection<String> targets = getTargets(player.getName(), myPlayer);
+		
+		if (setBy.equals(getID())) {
+			//if we set the target, make sure the target is still valid
+			return !targets.contains(choice);
+		}
+		
+		return !targets.isEmpty();
+	}
+
+	@Override
+	public ActionI generateAction(AbstractPlayer player, BeliefSystem myPlayer) {
+		
+		List<String> targets = getTargets(player.getName(), myPlayer);
+		if (targets.isEmpty()) {
+			return null;
+		}
+		
+		choice = targets.get(random.nextInt(targets.size()));
+		return new LynchAction(choice);
+	}
+	
+	/**
+	 * We consider a role unsafe if the role is unknown
+	 * 
+	 * @param role the role we are checking
+	 * @return true if the role is unsafe, false otherwise
+	 */
+	private boolean isUnsafe(String role) {
+		return role == null;
 	}
 	
 	private List<String> getTargets(String name, BeliefSystem beliefs) {		
@@ -34,31 +74,8 @@ public class RandomUnsafeLynch implements Behavour {
 	}
 
 	@Override
-	public boolean canActivate(AbstractPlayer player, BeliefSystem myPlayer, ActionI a) {
-		Collection<String> targets = getTargets(player.getName() ,myPlayer);
-		return a == null && player.isState(GameState.DAYTIME) && !targets.isEmpty();
-	}
-
-	@Override
-	public ActionI generateAction(AbstractPlayer player, BeliefSystem myPlayer) {
-		
-		List<String> targets = getTargets(player.getName(), myPlayer);
-		if (targets.isEmpty()) {
-			return null;
-		}
-		
-		String choice = targets.get(random.nextInt(targets.size()));
-		return new LynchAction(choice);
-	}
-	
-	/**
-	 * We consider a role unsafe if the role is unknown
-	 * 
-	 * @param role the role we are checking
-	 * @return true if the role is unsafe, false otherwise
-	 */
-	private boolean isUnsafe(String role) {
-		return role == null;
+	public String getID() {
+		return "lynchRandomUnsafe";
 	}
 
 }

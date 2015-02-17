@@ -34,6 +34,8 @@ public class WolfController implements Runnable {
 	private Collection<Queue<EventI>> events;
 	private Map<String, Queue<EventI>> playerEvents;
 	private BlockingQueue<ActionWrapper> actions;
+	
+	private int currentTurn;
 
 	public WolfController(WolfModel model) {
 		this.model = model;
@@ -145,6 +147,7 @@ public class WolfController implements Runnable {
 
 	public void setState(GameState newState) {
 		this.state = newState;
+		currentTurn++;
 		broadcast(new StateChanged(state));
 	}
 	
@@ -204,6 +207,10 @@ public class WolfController implements Runnable {
 		public String toString() {
 			return "("+player+","+action+")";
 		}
+	}
+	
+	public int getTurnCounter() {
+		return currentTurn;
 	}
 
 }

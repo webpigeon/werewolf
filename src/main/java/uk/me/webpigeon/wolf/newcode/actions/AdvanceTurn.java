@@ -14,9 +14,11 @@ import uk.me.webpigeon.wolf.newcode.events.PlayerDeath;
  * Action to advance the current turn to the next game phase.
  */
 public class AdvanceTurn extends NewAction {
+	private int turnCount;
 	
-	public AdvanceTurn() {
+	public AdvanceTurn(int turnCount) {
 		super(GameState.DAYTIME, GameState.NIGHTTIME);
+		this.turnCount = turnCount;
 	}
 	
 	@Override
@@ -24,6 +26,12 @@ public class AdvanceTurn extends NewAction {
 		GameState currentState = controller.getState();
 		if (!isPermittedState(currentState)) {
 			System.err.println("tried to advance turn when not in main game stage");
+			return;
+		}
+		
+		int currentTurn = controller.getTurnCounter();
+		if (currentTurn+1 != turnCount) {
+			// turn advanced already
 			return;
 		}
 		

@@ -68,7 +68,7 @@ public class WolfFrame {
 	}
 	
 	public void printContext(String message) {
-		log.appendText("<i>["+message+"]</i>");
+		log.appendText("<font color=\"#006600\"><i>["+message+"]</i></font>");
 	}
 	
 	public void printNarrative(String message) {

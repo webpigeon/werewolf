@@ -9,6 +9,7 @@ import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 
 public class BehavourPlayer extends AbstractPlayer {
 	private List<Behavour> behavours;
+	private String setByBehavour;
 	
 	public BehavourPlayer() {
 		this.behavours = new ArrayList<Behavour>();
@@ -22,7 +23,8 @@ public class BehavourPlayer extends AbstractPlayer {
 	public ActionI selectAction(BeliefSystem system) {
 		
 		for (Behavour behavour : behavours) {
-			if (behavour.canActivate(this, system, currentAction)) {
+			if (behavour.canActivate(this, system, setByBehavour)) {
+				setByBehavour = behavour.getID();
 				return behavour.generateAction(this, system);
 			}
 		}
@@ -30,4 +32,9 @@ public class BehavourPlayer extends AbstractPlayer {
 		return null;
 	}
 	
+	@Override
+	protected void clearBlocks() {
+		super.clearBlocks();
+		setByBehavour = null;
+	}
 }

@@ -9,9 +9,13 @@ import uk.me.webpigeon.wolf.newcode.players.PlayerUtils;
 public class DebugAnnounceRole implements Behavour {
 	private int playerCount;
 	private boolean roleAnnounced;
+	
+	public String getID(){
+		return "DebugAnnounceRole";
+	}
 
 	@Override
-	public boolean canActivate(AbstractPlayer player, BeliefSystem beliefs, ActionI currentAction) {
+	public boolean canActivate(AbstractPlayer player, BeliefSystem beliefs, String setBy) {
 		int currentPlayerCount = beliefs.getPlayers().size();
 		String myRole = beliefs.getRole(beliefs.getMyName());
 		if (playerCount < currentPlayerCount && myRole != null) {

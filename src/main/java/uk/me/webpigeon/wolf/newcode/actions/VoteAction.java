@@ -50,7 +50,7 @@ public abstract class VoteAction extends NewAction {
 				}
 				
 				if (service.isFinished()) {
-					//controller.addTask(null, new AdvanceTurn());
+					controller.addTask(null, new AdvanceTurn(controller.getTurnCounter() + 1));
 				}
 			}
 		}

@@ -14,7 +14,7 @@ import uk.me.webpigeon.wolf.newcode.SessionManager;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 
 public class GameTimer implements GameListener {
-	private static final Integer TURN_TIME_LIMIT = 10000;
+	private static final Integer TURN_TIME_LIMIT = 100000;
 	private Timer timer;
 
 	public GameTimer(WolfController controller) {
