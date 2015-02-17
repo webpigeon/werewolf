@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Predicate;
 
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
@@ -91,6 +92,15 @@ public class WolfController implements Runnable {
 		Queue<EventI> eventQueue = playerEvents.get(player);
 		if (eventQueue != null) {
 			eventQueue.add(event);
+		}
+	}
+	
+	public void multicast(EventI event, Predicate<RoleI> filter) {
+		for (String player : model.getPlayers()) {
+			RoleI playerRole = model.getRole(player);
+			if (filter.test(playerRole)) {
+				unicast(player, event);
+			}
 		}
 	}
 	
@@ -195,4 +205,5 @@ public class WolfController implements Runnable {
 			return "("+player+","+action+")";
 		}
 	}
+
 }

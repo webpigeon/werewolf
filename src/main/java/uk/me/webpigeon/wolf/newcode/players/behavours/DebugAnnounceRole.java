@@ -26,8 +26,19 @@ public class DebugAnnounceRole implements Behavour {
 	@Override
 	public ActionI generateAction(AbstractPlayer player, BeliefSystem beliefs) {
 		String myRole = beliefs.getRole(beliefs.getMyName());
-		String message = PlayerUtils.toTripple(beliefs.getMyName(), "role", myRole);
+		
 		roleAnnounced = true;
+		String message = PlayerUtils.toTripple(beliefs.getMyName(), "role", myRole);
+		if ("wolf".equals(myRole)) {
+			//wolves will only announce to the wolf team
+			return new TalkAction(null, message, "wolf");
+		}
+		
+		if ("seer".equals(myRole)) {
+			//seers will announce to no one
+			return null;
+		}
+
 		return new TalkAction(null, message);
 	}
 
