@@ -27,7 +27,6 @@ public class RuleBasedStrategy implements SelectionStrategy {
 		for (ProductionRule behavour : behavours) {
 		
 			if (behavour.canActivate(facts, setByBehavour)) {
-				System.out.println("executing: "+behavour.getID());
 				setByBehavour = behavour.getID();
 				return behavour.generateAction(facts);
 			}

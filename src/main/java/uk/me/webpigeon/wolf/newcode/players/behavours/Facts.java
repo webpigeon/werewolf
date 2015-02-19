@@ -9,6 +9,7 @@ public interface Facts {
 	
 	public static final String ALIVE_PLAYERS = "alivePlayers";
 	public static final String DEAD_PLAYERS = "deadPlayers";
+	public static final String UNTRUSTWORTHY_PLAYERS = "lierPlayers";
 	
 	public static final String CURRENT_VOTES = "currentVotes";
 	
@@ -19,4 +20,6 @@ public interface Facts {
 	public static final String GAME_STATE = "gameState";
 	
 	public static final String PLAYER_ROLE = "%s-role";
+	public static final String PLAYER_MESSAGES = "%s-messages";
+	public static final String PLAYER_DEATH_ROLE = "%s-death-role";
 }

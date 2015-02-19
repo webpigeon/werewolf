@@ -7,6 +7,7 @@ import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 import uk.me.webpigeon.wolf.newcode.players.MultiMapFacts;
 import uk.me.webpigeon.wolf.newcode.players.SelectionPlayer;
 import uk.me.webpigeon.wolf.newcode.players.SelectionStrategy;
+import uk.me.webpigeon.wolf.newcode.players.behavours.DetectLiers;
 import uk.me.webpigeon.wolf.newcode.players.behavours.ProductionRule;
 import uk.me.webpigeon.wolf.newcode.players.behavours.DebugAnnounceRole;
 import uk.me.webpigeon.wolf.newcode.players.behavours.EatSomeone;
@@ -40,6 +41,7 @@ public class WolfFactory {
 	
 	public static SessionManager buildBehavourPlayer(String name) {
 		ProductionRule[] behavours = new ProductionRule[] {
+				new DetectLiers(),
 				new SeerSavingAnnounce(),
 				new DebugAnnounceRole(),
 				new LieAboutRole(),

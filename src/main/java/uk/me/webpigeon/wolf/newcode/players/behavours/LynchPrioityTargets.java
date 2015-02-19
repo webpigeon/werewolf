@@ -43,7 +43,6 @@ public class LynchPrioityTargets implements ProductionRule {
 	public boolean canActivate(FactBase beliefs, String setBy) {
 		
 		if (!beliefs.hasFact(Facts.GAME_STATE, "DAYTIME") || !beliefs.hasFact(Facts.AGENT_ROLE, ourRole) ){
-			System.out.println("it is not daytime or I am not a "+ourRole);
 			return false;
 		}
 		

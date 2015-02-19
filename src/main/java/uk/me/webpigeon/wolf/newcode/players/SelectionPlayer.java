@@ -1,5 +1,6 @@
 package uk.me.webpigeon.wolf.newcode.players;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -119,7 +120,7 @@ public class SelectionPlayer implements Runnable, SessionManager {
 		
 			case "death":
 				PlayerDeath pd = (PlayerDeath)event;
-				String deathRoleFactName = String.format(Facts.PLAYER_ROLE, pd.player);
+				String deathRoleFactName = String.format(Facts.PLAYER_DEATH_ROLE, pd.player);
 				beliefs.storeFact(deathRoleFactName, pd.role);
 				beliefs.removeFact(Facts.ALIVE_PLAYERS, pd.player);
 				beliefs.storeFact(Facts.DEAD_PLAYERS, pd.player);
@@ -127,7 +128,10 @@ public class SelectionPlayer implements Runnable, SessionManager {
 				
 			case "chat":
 				ChatMessage pc = (ChatMessage)event;
-				parseChat(pc);
+				List<String> untrustworthyPlayers = beliefs.getValues(Facts.UNTRUSTWORTHY_PLAYERS);
+				if (!untrustworthyPlayers.contains(pc.player)) {
+					parseChat(pc);	
+				}
 				break;
 				
 			default:
@@ -161,13 +165,20 @@ public class SelectionPlayer implements Runnable, SessionManager {
 			String roleFactName = String.format(Facts.PLAYER_ROLE, t.object);
 			beliefs.storeFact(roleFactName, t.subject);
 		}
-		System.out.println(name+" "+beliefs);
+		
+		// store what they said in the list of things they said
+		String saidFactString = String.format(Facts.PLAYER_MESSAGES, pc.player);
+		beliefs.storeFact(saidFactString, t.toStore());
 	}
 	
 	private class Tripple {
 		public String object;
 		public String verb;
 		public String subject;
+		
+		public String toStore() {
+			return String.format("%s %s %s",object,verb,subject);
+		}
 		
 		@Override
 		public int hashCode() {
