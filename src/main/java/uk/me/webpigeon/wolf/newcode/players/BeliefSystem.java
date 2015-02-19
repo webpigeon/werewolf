@@ -20,11 +20,14 @@ public class BeliefSystem {
 	private final Map<String, Double> trust;
 	private final Pattern chatPattern;
 	
+	private final List<String> facts;
+	
 	public String name;
 	private RoleI myRole;
 	private GameState state;
 
 	public BeliefSystem() {
+		this.facts = new ArrayList<String>();
 		this.chatPattern = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
 		this.alivePlayers = new ArrayList<String>();
 		this.roles = new TreeMap<String, String>();

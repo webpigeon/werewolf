@@ -4,8 +4,10 @@ import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.actions.TalkAction;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
+import uk.me.webpigeon.wolf.newcode.players.FactBase;
 import uk.me.webpigeon.wolf.newcode.players.PlayerUtils;
 
+//TODO implement this again later
 public class SeerSavingAnnounce implements ProductionRule {
 	private final static Double PANIC_TRESHOLD = 0.45;
 	private int playerCount;
@@ -16,8 +18,8 @@ public class SeerSavingAnnounce implements ProductionRule {
 	}
 
 	@Override
-	public boolean canActivate(BeliefSystem beliefs, String setBy) {
-		int currentPlayerCount = beliefs.getPlayers().size();
+	public boolean canActivate(FactBase beliefs, String setBy) {
+		/*int currentPlayerCount = beliefs.getPlayers().size();
 		String myRole = beliefs.getRole(beliefs.getMyName());
 		if (playerCount < currentPlayerCount && myRole != null) {
 			// a new game started
@@ -30,14 +32,14 @@ public class SeerSavingAnnounce implements ProductionRule {
 		
 		if (voteRatio > PANIC_TRESHOLD) {
 			return !roleAnnounced;
-		}
+		}*/
 		
 		return false;
 	}
 
 	@Override
-	public ActionI generateAction(BeliefSystem beliefs) {
-		String myRole = beliefs.getRole(beliefs.getMyName());
+	public ActionI generateAction(FactBase beliefs) {
+		/*String myRole = beliefs.getRole(beliefs.getMyName());
 		
 		roleAnnounced = true;
 		String message = PlayerUtils.toTripple(beliefs.getMyName(), "role", myRole);
@@ -45,7 +47,8 @@ public class SeerSavingAnnounce implements ProductionRule {
 			//seers will announce to no one
 			return new TalkAction(null, message);
 		}
-
+		*/
+		
 		return null;
 	}
 

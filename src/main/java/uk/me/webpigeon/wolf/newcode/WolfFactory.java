@@ -4,6 +4,7 @@ import uk.me.webpigeon.wolf.newcode.actions.WolfUtils;
 import uk.me.webpigeon.wolf.newcode.legacy.LegacyUtils;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
+import uk.me.webpigeon.wolf.newcode.players.MultiMapFacts;
 import uk.me.webpigeon.wolf.newcode.players.SelectionPlayer;
 import uk.me.webpigeon.wolf.newcode.players.SelectionStrategy;
 import uk.me.webpigeon.wolf.newcode.players.behavours.ProductionRule;
@@ -43,10 +44,10 @@ public class WolfFactory {
 				new DebugAnnounceRole(),
 				new LieAboutRole(),
 				new EatSomeone(),
+				new LynchPrioityTargets("seer", "wolf"),
 				new LynchPrioityTargets("wolf", "seer"),
 				new LynchPrioityTargets("villager", "wolf"),
-				new LynchPrioityTargets("seer", "wolf"),
-				new RandomUnsafeLynch()
+				//new RandomUnsafeLynch()
 		};
 		
 		return buildPlayer(name, behavours);
@@ -71,7 +72,7 @@ public class WolfFactory {
 	}
 	
 	public static SessionManager buildPlayer(String name, SelectionStrategy strat) {
-		SelectionPlayer player = new SelectionPlayer(strat, new BeliefSystem());
+		SelectionPlayer player = new SelectionPlayer(strat, new MultiMapFacts());
 		
 		Thread t = new Thread(player);
 		t.setName("player-"+name);

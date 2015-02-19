@@ -10,6 +10,7 @@ import uk.me.webpigeon.wolf.newcode.actions.EatAction;
 import uk.me.webpigeon.wolf.newcode.actions.LynchAction;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
+import uk.me.webpigeon.wolf.newcode.players.FactBase;
 
 /**
  * Vote for a random player we know not to be a "safe" role
@@ -27,17 +28,35 @@ public class EatSomeone implements ProductionRule {
 	}
 	
 	@Override
-	public boolean canActivate(BeliefSystem myPlayer, String setBy) {
-		return myPlayer.isInState(GameState.NIGHTTIME) && myPlayer.isRole("wolf") && !"EatSomeone".equals(setBy);
+	public boolean canActivate(FactBase facts, String setBy) {
+		String myID = getID();
+		if (myID.equals(setBy)) {
+			return false;
+		}
+		
+		return facts.hasFact(Facts.AGENT_ROLE, "wolf") && facts.hasFact(Facts.GAME_STATE, "nighttime");
 	}
 
 	@Override
-	public ActionI generateAction(BeliefSystem myPlayer) {
+	public ActionI generateAction(FactBase beliefs) {
 		
 		List<String> targets = new ArrayList<String>();
-		for (String player : myPlayer.getPlayers()) {
-			String role = myPlayer.getRole(player);
-			if (isTarget(role)) {
+		for (String player : beliefs.getValues(Facts.AGENT_NAME)) {
+			String roleFactName = String.format(Facts.PLAYER_ROLE, player);
+			
+			//TODO make safe roles a belief
+			boolean isSafe = false;
+			List<String> possibleRoles = beliefs.getValues(roleFactName);
+			for (String safeRole : SAFE_ROLES) {
+				
+				//we're being cautious, If we think the player *might* be a wolf, don't eat them
+				if (possibleRoles.contains(safeRole)){
+					isSafe = true;
+					break;
+				}
+			}
+			
+			if (!isSafe) {
 				targets.add(player);
 			}
 		}
@@ -48,26 +67,6 @@ public class EatSomeone implements ProductionRule {
 		
 		String choice = targets.get(random.nextInt(targets.size()));
 		return new EatAction(choice);
-	}
-	
-	/**
-	 * We consider a role unsafe if the role is unknown or in UNSAFE_ROLES.
-	 * 
-	 * @param role the role we are checking
-	 * @return true if the role is unsafe, false otherwise
-	 */
-	private boolean isTarget(String role) {
-		if (role == null) {
-			return true;
-		}
-		
-		for (String safeRole : SAFE_ROLES) {
-			if (safeRole.equals(role)) {
-				return false;
-			}
-		}
-		
-		return true;
 	}
 
 }

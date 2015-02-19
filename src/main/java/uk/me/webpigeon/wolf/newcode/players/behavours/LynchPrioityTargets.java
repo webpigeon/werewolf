@@ -11,6 +11,7 @@ import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.actions.LynchAction;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
+import uk.me.webpigeon.wolf.newcode.players.FactBase;
 
 /**
  * Vote for a random player we know not to be a "safe" role
@@ -39,21 +40,24 @@ public class LynchPrioityTargets implements ProductionRule {
 	}
 	
 	@Override
-	public boolean canActivate(BeliefSystem myPlayer, String setBy) {
+	public boolean canActivate(FactBase beliefs, String setBy) {
 		
-		if (!myPlayer.isInState(GameState.DAYTIME) || !myPlayer.isRole(ourRole) ){
+		if (!beliefs.hasFact(Facts.GAME_STATE, "DAYTIME") || !beliefs.hasFact(Facts.AGENT_ROLE, ourRole) ){
+			System.out.println("it is not daytime or I am not a "+ourRole);
 			return false;
 		}
 		
-		buildTargetMap(myPlayer);
+		buildTargetMap(beliefs);
 		return !targetMap.isEmpty();
 	}
 
 	@Override
-	public ActionI generateAction(BeliefSystem myPlayer) {
+	public ActionI generateAction(FactBase beliefs) {
 		if (targetMap == null || targetMap.isEmpty()) {
-			buildTargetMap(myPlayer);
+			buildTargetMap(beliefs);
 		}
+		
+		List<String> alivePlayers = beliefs.getValues(Facts.ALIVE_PLAYERS);
 		
 		// I'm hoping the order of entryset is defined for an ordered map, else I'll be sad.
 		for (Map.Entry<Integer, List<String>> targetsEntry : targetMap.entrySet()) {
@@ -64,7 +68,7 @@ public class LynchPrioityTargets implements ProductionRule {
 			}
 			
 			for (String target : targets) {
-				if (myPlayer.isAlive(target)) {
+				if (alivePlayers.contains(target)) {
 					// find the first alive player and return them
 					return new LynchAction(target);
 				}
@@ -77,24 +81,29 @@ public class LynchPrioityTargets implements ProductionRule {
 		return null;
 	}
 	
-	private void buildTargetMap(BeliefSystem beliefs) {
+	private void buildTargetMap(FactBase beliefs) {
 		targetMap = new TreeMap<>();
 		
-		for (String player : beliefs.getPlayers()) {
+		List<String> alivePlayers = beliefs.getValues(Facts.ALIVE_PLAYERS);
+		for (String player : alivePlayers) {
 			
-			String role = beliefs.getRole(player);
-			if (role == null) {
+			String roleFactName = String.format(Facts.PLAYER_ROLE, player);
+			List<String> possibleRoles = beliefs.getValues(roleFactName);
+			
+			if (possibleRoles.isEmpty()) {
 				continue;
 			}
 			
-			Integer score = scores.get(role);
-			if (score != null ){
-				List<String> playerList = targetMap.get(score);
-				if (playerList == null) {
-					playerList = new ArrayList<String>();
-					targetMap.put(score, playerList);
+			for (String role : possibleRoles) {
+				Integer score = scores.get(role);
+				if ( score != null ){
+					List<String> playerList = targetMap.get(score);
+					if (playerList == null) {
+						playerList = new ArrayList<String>();
+						targetMap.put(score, playerList);
+					}
+					playerList.add(player);
 				}
-				playerList.add(player);
 			}
 			
 		}

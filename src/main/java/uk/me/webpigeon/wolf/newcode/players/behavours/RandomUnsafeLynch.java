@@ -10,6 +10,7 @@ import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.actions.LynchAction;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
+import uk.me.webpigeon.wolf.newcode.players.FactBase;
 
 /**
  * Vote for a random player we know not to be a "safe" role
@@ -23,26 +24,29 @@ public class RandomUnsafeLynch implements ProductionRule {
 	}
 
 	@Override
-	public boolean canActivate(BeliefSystem myPlayer, String setBy) {
-		if (!myPlayer.isInState(GameState.DAYTIME)) {
-			// we can only lynch during the daytime
+	public boolean canActivate(FactBase facts, String setBy) {
+		// we can only lynch during the daytime
+		if (!facts.hasFact(Facts.GAME_STATE, GameState.DAYTIME.name())) {
 			return false;
 		}
 		
-		Collection<String> targets = getTargets(myPlayer.getMyName(), myPlayer);
+		Collection<String> targets = getTargets(facts);
 		
 		if (setBy != null && setBy.equals(getID())) {
 			//if we set the target, make sure the target is still valid
 			return !targets.contains(choice);
 		}
 		
+		System.out.println("targets: "+targets);
+		
+		
 		return !targets.isEmpty();
 	}
 
 	@Override
-	public ActionI generateAction(BeliefSystem myPlayer) {
+	public ActionI generateAction(FactBase facts) {
 		
-		List<String> targets = getTargets(myPlayer.getMyName(), myPlayer);
+		List<String> targets = getTargets(facts);
 		if (targets.isEmpty()) {
 			return null;
 		}
@@ -61,15 +65,25 @@ public class RandomUnsafeLynch implements ProductionRule {
 		return role == null;
 	}
 	
-	private List<String> getTargets(String name, BeliefSystem beliefs) {		
+	private List<String> getTargets(FactBase facts) {		
+		List<String> alivePlayers = facts.getValues(Facts.ALIVE_PLAYERS);
+		
 		List<String> unsafePlayers = new ArrayList<String>();
-		for (String player : beliefs.getPlayers() ) {
-			String role = beliefs.getRole(player);
+		for (String player : alivePlayers) {
+			String roleFactName = String.format(Facts.PLAYER_ROLE, player);
+			Collection<String> possibleRoles = facts.getValues(roleFactName);
 			
-			if (isUnsafe(role) && !player.equals(name)) {
+			if (possibleRoles.isEmpty()) {
 				unsafePlayers.add(player);
+			} else {		
+				for (String possibleRole : possibleRoles) {
+					if (isUnsafe(possibleRole)) {
+						unsafePlayers.add(player);
+					}
+				}
 			}
 		}
+		
 		return unsafePlayers;
 	}
 

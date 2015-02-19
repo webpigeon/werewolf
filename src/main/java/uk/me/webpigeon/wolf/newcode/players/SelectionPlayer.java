@@ -2,6 +2,8 @@ package uk.me.webpigeon.wolf.newcode.players;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import uk.me.webpigeon.wolf.GameState;
 import uk.me.webpigeon.wolf.RoleI;
@@ -15,6 +17,7 @@ import uk.me.webpigeon.wolf.newcode.events.PlayerDeath;
 import uk.me.webpigeon.wolf.newcode.events.PlayerRole;
 import uk.me.webpigeon.wolf.newcode.events.PlayerVote;
 import uk.me.webpigeon.wolf.newcode.events.StateChanged;
+import uk.me.webpigeon.wolf.newcode.players.behavours.Facts;
 
 /**
  * A basis for players based around the new game engine.
@@ -23,16 +26,19 @@ public class SelectionPlayer implements Runnable, SessionManager {
 	
 	private String name;
 
+	private final Pattern chatPattern;
+	private final SelectionStrategy strategy;
+	
 	private WolfController controller;
 	private BlockingQueue<EventI> eventQueue;
-	private BeliefSystem system;
-	private SelectionStrategy strategy;
+	private FactBase beliefs;
 	
 	protected ActionI currentAction;
 	
-	public SelectionPlayer(SelectionStrategy strat, BeliefSystem system) {
+	public SelectionPlayer(SelectionStrategy strat, FactBase beliefs) {
+		this.chatPattern = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
 		this.strategy = strat;
-		this.system = system;
+		this.beliefs = beliefs;
 	}
 
 	@Override
@@ -40,7 +46,6 @@ public class SelectionPlayer implements Runnable, SessionManager {
 		this.name = name;
 		this.controller = controller;
 		this.eventQueue = eventQueue;
-		system.setPlayerName(name);
 	}
 	
 	public void run() {
@@ -60,7 +65,7 @@ public class SelectionPlayer implements Runnable, SessionManager {
 					processEvent(event);
 				}
 				
-				ActionI action = strategy.selectAction(system);
+				ActionI action = strategy.selectAction(beliefs);
 				if (action != null && !action.equals(currentAction)) {
 					controller.addTask(name, action);
 					currentAction = action;
@@ -78,40 +83,51 @@ public class SelectionPlayer implements Runnable, SessionManager {
 	private void processEvent(EventI event) {
 		switch(event.getType()) {
 			case "gameStarted":
-				system.clear();
+				beliefs.reset();
+				beliefs.storeFact(Facts.AGENT_NAME, name);
+				beliefs.storeFact(Facts.GAME_ID, "wolf-"+System.nanoTime());
 				GameStarted gs = (GameStarted)event;
-				system.setPlayers(gs.players);
+				for (String player : gs.players) {
+					beliefs.storeFact(Facts.ALIVE_PLAYERS, player);
+				}
 				break;
 				
 			case "stateChange":
 				StateChanged sc = (StateChanged)event;
-				system.setState(sc.newState);
+				beliefs.removeFact(Facts.GAME_STATE);
+				beliefs.storeFact(Facts.GAME_STATE, sc.newState.name());
 				clearBlocks();
 				break;
 				
 			case "vote":
 				PlayerVote pv = (PlayerVote)event;
-				system.registerVote(pv.vote);
+				//TODO cleanup changed votes
+				//TODO record (voter,votee) pairs
+				beliefs.storeFact(Facts.CURRENT_VOTES, pv.vote);
 				//system.recordRole(pv.player, pv.vote);
 				break;
 				
 			case "role":
 				PlayerRole pr = (PlayerRole)event;
-				system.recordRole(pr.name, pr.role.getName());
+				
+				String roleFactName = String.format(Facts.PLAYER_ROLE, pr.name);
+				beliefs.storeFact(roleFactName, pr.role.getName());
 				if (name.equals(pr.name)){
-					system.setRole(pr.role);
+					beliefs.storeFact(Facts.AGENT_ROLE, pr.role.getName());
 				}
 				break;
 		
 			case "death":
 				PlayerDeath pd = (PlayerDeath)event;
-				system.recordRole(pd.player, pd.role);
-				system.removePlayer(pd.player);
+				String deathRoleFactName = String.format(Facts.PLAYER_ROLE, pd.player);
+				beliefs.storeFact(deathRoleFactName, pd.role);
+				beliefs.removeFact(Facts.ALIVE_PLAYERS, pd.player);
+				beliefs.storeFact(Facts.DEAD_PLAYERS, pd.player);
 				break;
 				
 			case "chat":
 				ChatMessage pc = (ChatMessage)event;
-				system.parseChat(pc);
+				parseChat(pc);
 				break;
 				
 			default:
@@ -125,7 +141,81 @@ public class SelectionPlayer implements Runnable, SessionManager {
 	
 	protected void clearBlocks() {
 		currentAction = null;
-		system.cleanVotes();
+		beliefs.removeFact(Facts.CURRENT_VOTES);
+		
+		strategy.announceNewTurn();
+	}
+	
+	public void parseChat(ChatMessage pc) {
+		Matcher m = chatPattern.matcher(pc.message);
+		if (!m.matches()) {
+			return;
+		}
+		
+		Tripple t = new Tripple();
+		t.object = m.group(1);
+		t.verb = m.group(2);
+		t.subject = m.group(3);
+
+		if ("role".equals(t.verb)) {
+			String roleFactName = String.format(Facts.PLAYER_ROLE, t.object);
+			beliefs.storeFact(roleFactName, t.subject);
+		}
+		System.out.println(name+" "+beliefs);
+	}
+	
+	private class Tripple {
+		public String object;
+		public String verb;
+		public String subject;
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((object == null) ? 0 : object.hashCode());
+			result = prime * result
+					+ ((subject == null) ? 0 : subject.hashCode());
+			result = prime * result + ((verb == null) ? 0 : verb.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Tripple other = (Tripple) obj;
+			if (object == null) {
+				if (other.object != null)
+					return false;
+			} else if (!object.equals(other.object))
+				return false;
+			if (subject == null) {
+				if (other.subject != null)
+					return false;
+			} else if (!subject.equals(other.subject))
+				return false;
+			if (verb == null) {
+				if (other.verb != null)
+					return false;
+			} else if (!verb.equals(other.verb))
+				return false;
+			return true;
+		}
+
+		public String serialise() {
+			return String.format("(%s,%s,%s)", object, verb, subject);
+		}
+		
+		public String toString() {
+			return serialise();
+		}
+
 	}
 	
 }
