@@ -14,7 +14,7 @@ import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 /**
  * Vote for a random player we know not to be a "safe" role
  */
-public class RandomUnsafeLynch implements Behavour {
+public class RandomUnsafeLynch implements ProductionRule {
 	private Random random;
 	private String choice;
 	
@@ -23,13 +23,13 @@ public class RandomUnsafeLynch implements Behavour {
 	}
 
 	@Override
-	public boolean canActivate(AbstractPlayer player, BeliefSystem myPlayer, String setBy) {
-		if (!player.isState(GameState.DAYTIME)) {
+	public boolean canActivate(BeliefSystem myPlayer, String setBy) {
+		if (!myPlayer.isInState(GameState.DAYTIME)) {
 			// we can only lynch during the daytime
 			return false;
 		}
 		
-		Collection<String> targets = getTargets(player.getName(), myPlayer);
+		Collection<String> targets = getTargets(myPlayer.getMyName(), myPlayer);
 		
 		if (setBy != null && setBy.equals(getID())) {
 			//if we set the target, make sure the target is still valid
@@ -40,9 +40,9 @@ public class RandomUnsafeLynch implements Behavour {
 	}
 
 	@Override
-	public ActionI generateAction(AbstractPlayer player, BeliefSystem myPlayer) {
+	public ActionI generateAction(BeliefSystem myPlayer) {
 		
-		List<String> targets = getTargets(player.getName(), myPlayer);
+		List<String> targets = getTargets(myPlayer.getMyName(), myPlayer);
 		if (targets.isEmpty()) {
 			return null;
 		}

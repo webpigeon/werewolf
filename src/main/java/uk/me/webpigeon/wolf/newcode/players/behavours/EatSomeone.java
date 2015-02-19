@@ -14,7 +14,7 @@ import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 /**
  * Vote for a random player we know not to be a "safe" role
  */
-public class EatSomeone implements Behavour {
+public class EatSomeone implements ProductionRule {
 	private static final String[] SAFE_ROLES = {"wolf"};
 	private Random random;
 	
@@ -27,12 +27,12 @@ public class EatSomeone implements Behavour {
 	}
 	
 	@Override
-	public boolean canActivate(AbstractPlayer player, BeliefSystem myPlayer, String setBy) {
-		return player.isState(GameState.NIGHTTIME) && player.isRole("wolf") && !"EatSomeone".equals(setBy);
+	public boolean canActivate(BeliefSystem myPlayer, String setBy) {
+		return myPlayer.isInState(GameState.NIGHTTIME) && myPlayer.isRole("wolf") && !"EatSomeone".equals(setBy);
 	}
 
 	@Override
-	public ActionI generateAction(AbstractPlayer player1, BeliefSystem myPlayer) {
+	public ActionI generateAction(BeliefSystem myPlayer) {
 		
 		List<String> targets = new ArrayList<String>();
 		for (String player : myPlayer.getPlayers()) {

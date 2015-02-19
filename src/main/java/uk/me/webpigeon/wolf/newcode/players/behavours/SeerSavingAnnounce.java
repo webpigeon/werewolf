@@ -6,7 +6,7 @@ import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 import uk.me.webpigeon.wolf.newcode.players.PlayerUtils;
 
-public class SeerSavingAnnounce implements Behavour {
+public class SeerSavingAnnounce implements ProductionRule {
 	private final static Double PANIC_TRESHOLD = 0.45;
 	private int playerCount;
 	private boolean roleAnnounced;
@@ -16,7 +16,7 @@ public class SeerSavingAnnounce implements Behavour {
 	}
 
 	@Override
-	public boolean canActivate(AbstractPlayer player, BeliefSystem beliefs, String setBy) {
+	public boolean canActivate(BeliefSystem beliefs, String setBy) {
 		int currentPlayerCount = beliefs.getPlayers().size();
 		String myRole = beliefs.getRole(beliefs.getMyName());
 		if (playerCount < currentPlayerCount && myRole != null) {
@@ -25,7 +25,7 @@ public class SeerSavingAnnounce implements Behavour {
 			roleAnnounced = false;
 		}
 		
-		double votes = beliefs.getVotesFor(player.getName());
+		double votes = beliefs.getVotesFor(beliefs.getMyName());
 		double voteRatio = votes / beliefs.getPlayers().size();
 		
 		if (voteRatio > PANIC_TRESHOLD) {
@@ -36,7 +36,7 @@ public class SeerSavingAnnounce implements Behavour {
 	}
 
 	@Override
-	public ActionI generateAction(AbstractPlayer player, BeliefSystem beliefs) {
+	public ActionI generateAction(BeliefSystem beliefs) {
 		String myRole = beliefs.getRole(beliefs.getMyName());
 		
 		roleAnnounced = true;

@@ -9,6 +9,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import uk.me.webpigeon.wolf.GameState;
+import uk.me.webpigeon.wolf.RoleI;
 import uk.me.webpigeon.wolf.newcode.events.ChatMessage;
 
 public class BeliefSystem {
@@ -19,6 +21,8 @@ public class BeliefSystem {
 	private final Pattern chatPattern;
 	
 	public String name;
+	private RoleI myRole;
+	private GameState state;
 
 	public BeliefSystem() {
 		this.chatPattern = Pattern.compile("\\((\\w+),(\\w+),(\\w+)\\)");
@@ -201,6 +205,29 @@ public class BeliefSystem {
 		
 		Integer voteCount = votes.get(name);
 		return voteCount==null?0:voteCount;
+	}
+
+	public void setState(GameState newState) {
+		this.state = newState;
+	}
+	
+	public GameState getState() {
+		return this.state;
+	}
+	
+	public boolean isInState(GameState s) {
+		return state.equals(s);
+	}
+	
+	public boolean isRole(String gameRole) {
+		if (myRole == null) {
+			return false;
+		}
+		return myRole.getName().equals(gameRole);
+	}
+	
+	void setRole(RoleI role) {
+		this.myRole = role;
 	}
 	
 }

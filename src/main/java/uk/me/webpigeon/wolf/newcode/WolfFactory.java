@@ -3,13 +3,16 @@ package uk.me.webpigeon.wolf.newcode;
 import uk.me.webpigeon.wolf.newcode.actions.WolfUtils;
 import uk.me.webpigeon.wolf.newcode.legacy.LegacyUtils;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
-import uk.me.webpigeon.wolf.newcode.players.behavours.Behavour;
-import uk.me.webpigeon.wolf.newcode.players.behavours.BehavourPlayer;
+import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
+import uk.me.webpigeon.wolf.newcode.players.SelectionPlayer;
+import uk.me.webpigeon.wolf.newcode.players.SelectionStrategy;
+import uk.me.webpigeon.wolf.newcode.players.behavours.ProductionRule;
 import uk.me.webpigeon.wolf.newcode.players.behavours.DebugAnnounceRole;
 import uk.me.webpigeon.wolf.newcode.players.behavours.EatSomeone;
 import uk.me.webpigeon.wolf.newcode.players.behavours.LieAboutRole;
 import uk.me.webpigeon.wolf.newcode.players.behavours.LynchPrioityTargets;
 import uk.me.webpigeon.wolf.newcode.players.behavours.RandomUnsafeLynch;
+import uk.me.webpigeon.wolf.newcode.players.behavours.RuleBasedStrategy;
 import uk.me.webpigeon.wolf.newcode.players.behavours.SeerSavingAnnounce;
 
 public class WolfFactory {
@@ -22,7 +25,7 @@ public class WolfFactory {
 		WolfModel model = new WolfModel();
 		WolfController controller = new WolfController(model);
 
-		controller.addPlayer("Fred", buildBehavourPlayer("Fred"));
+		controller.addPlayer("Fred", buildRandomPlayer("Fred"));
 		controller.addPlayer("John", buildBehavourPlayer("John"));
 		controller.addPlayer("Bob", buildBehavourPlayer("Bob"));
 		controller.addPlayer("Wolfgang", buildBehavourPlayer("Wolfgang"));
@@ -35,7 +38,7 @@ public class WolfFactory {
 	}
 	
 	public static SessionManager buildBehavourPlayer(String name) {
-		Behavour[] behavours = new Behavour[] {
+		ProductionRule[] behavours = new ProductionRule[] {
 				new SeerSavingAnnounce(),
 				new DebugAnnounceRole(),
 				new LieAboutRole(),
@@ -50,22 +53,28 @@ public class WolfFactory {
 	}
 	
 	public static SessionManager buildRandomPlayer(String name) {
-		Behavour[] behavours = new Behavour[] {
+		ProductionRule[] behavours = new ProductionRule[] {
 				new RandomUnsafeLynch()
 		};
 		
 		return buildPlayer(name, behavours);
 	}
 	
-	public static SessionManager buildPlayer(String name, Behavour[] behavours) {
-		BehavourPlayer player = new BehavourPlayer();
+	public static SessionManager buildPlayer(String name, ProductionRule[] behavours) {
+		RuleBasedStrategy rbs = new RuleBasedStrategy();
 		
-		for (Behavour b : behavours) {
-			player.addBehavour(b);
+		for (ProductionRule b : behavours) {
+			rbs.addRule(b);
 		}
 		
+		return buildPlayer(name, rbs);
+	}
+	
+	public static SessionManager buildPlayer(String name, SelectionStrategy strat) {
+		SelectionPlayer player = new SelectionPlayer(strat, new BeliefSystem());
+		
 		Thread t = new Thread(player);
-		t.setName("behavour-"+name);
+		t.setName("player-"+name);
 		t.start();
 		
 		return player;

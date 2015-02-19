@@ -7,7 +7,7 @@ import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 import uk.me.webpigeon.wolf.newcode.players.PlayerUtils;
 
-public class LieAboutRole implements Behavour {
+public class LieAboutRole implements ProductionRule {
 	private int playerCount;
 	private boolean roleAnnounced;
 
@@ -17,7 +17,7 @@ public class LieAboutRole implements Behavour {
 	}
 
 	@Override
-	public boolean canActivate(AbstractPlayer player, BeliefSystem beliefs, String setByBehavour) {		
+	public boolean canActivate(BeliefSystem beliefs, String setByBehavour) {		
 		int currentPlayerCount = beliefs.getPlayers().size();
 		String myRole = beliefs.getRole(beliefs.getMyName());
 		if (playerCount < currentPlayerCount && myRole != null) {
@@ -30,9 +30,9 @@ public class LieAboutRole implements Behavour {
 	}
 
 	@Override
-	public ActionI generateAction(AbstractPlayer player, BeliefSystem beliefs) {
+	public ActionI generateAction(BeliefSystem beliefs) {
 		roleAnnounced = true;
-		return new TalkAction(null, PlayerUtils.toTripple(player.getName(), "role", "villager"));
+		return new TalkAction(null, PlayerUtils.toTripple(beliefs.getMyName(), "role", "villager"));
 	}
 
 }

@@ -19,18 +19,19 @@ import uk.me.webpigeon.wolf.newcode.events.StateChanged;
 /**
  * A basis for players based around the new game engine.
  */
-public abstract class AbstractPlayer implements Runnable, SessionManager {
+public class SelectionPlayer implements Runnable, SessionManager {
 	
 	private String name;
-	private RoleI role;
-	
+
 	private WolfController controller;
 	private BlockingQueue<EventI> eventQueue;
-	private GameState state;
 	private BeliefSystem system;
+	private SelectionStrategy strategy;
+	
 	protected ActionI currentAction;
 	
-	public AbstractPlayer(BeliefSystem system) {
+	public SelectionPlayer(SelectionStrategy strat, BeliefSystem system) {
+		this.strategy = strat;
 		this.system = system;
 	}
 
@@ -41,8 +42,6 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 		this.eventQueue = eventQueue;
 		system.setPlayerName(name);
 	}
-	
-	public abstract ActionI selectAction(BeliefSystem system);
 	
 	public void run() {
 		
@@ -61,12 +60,10 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 					processEvent(event);
 				}
 				
-				if (state == GameState.DAYTIME || state == GameState.NIGHTTIME) {
-					ActionI action = selectAction(system);
-					if (action != null && !action.equals(currentAction)) {
-						controller.addTask(name, action);
-						currentAction = action;
-					}
+				ActionI action = strategy.selectAction(system);
+				if (action != null && !action.equals(currentAction)) {
+					controller.addTask(name, action);
+					currentAction = action;
 				}
 				
 			} catch (InterruptedException e) {
@@ -88,7 +85,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 				
 			case "stateChange":
 				StateChanged sc = (StateChanged)event;
-				state = sc.newState;
+				system.setState(sc.newState);
 				clearBlocks();
 				break;
 				
@@ -102,7 +99,7 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 				PlayerRole pr = (PlayerRole)event;
 				system.recordRole(pr.name, pr.role.getName());
 				if (name.equals(pr.name)){
-					role = pr.role;
+					system.setRole(pr.role);
 				}
 				break;
 		
@@ -120,14 +117,6 @@ public abstract class AbstractPlayer implements Runnable, SessionManager {
 			default:
 				System.err.println("unknown event "+event.getType());
 		}
-	}
-
-	public boolean isState(GameState state) {
-		return this.state.equals(state);
-	}
-
-	public boolean isRole(String role) {
-		return role.equals(this.role.getName());
 	}
 
 	public String getName() {

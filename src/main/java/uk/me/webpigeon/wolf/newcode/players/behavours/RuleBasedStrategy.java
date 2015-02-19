@@ -6,35 +6,31 @@ import java.util.List;
 import uk.me.webpigeon.wolf.newcode.actions.ActionI;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
 import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
+import uk.me.webpigeon.wolf.newcode.players.SelectionStrategy;
 
-public class BehavourPlayer extends AbstractPlayer {
-	private List<Behavour> behavours;
+public class RuleBasedStrategy implements SelectionStrategy {
+	private List<ProductionRule> behavours;
 	private String setByBehavour;
 	
-	public BehavourPlayer() {
-		this.behavours = new ArrayList<Behavour>();
+	public RuleBasedStrategy() {
+		this.behavours = new ArrayList<ProductionRule>();
 	}
 
-	public void addBehavour(Behavour b) {
+	public void addRule(ProductionRule b) {
 		behavours.add(b);
 	}
 	
 	@Override
 	public ActionI selectAction(BeliefSystem system) {
 		
-		for (Behavour behavour : behavours) {
-			if (behavour.canActivate(this, system, setByBehavour)) {
+		for (ProductionRule behavour : behavours) {
+			if (behavour.canActivate(system, setByBehavour)) {
 				setByBehavour = behavour.getID();
-				return behavour.generateAction(this, system);
+				return behavour.generateAction(system);
 			}
 		}
 		
 		return null;
 	}
 	
-	@Override
-	protected void clearBlocks() {
-		super.clearBlocks();
-		setByBehavour = null;
-	}
 }

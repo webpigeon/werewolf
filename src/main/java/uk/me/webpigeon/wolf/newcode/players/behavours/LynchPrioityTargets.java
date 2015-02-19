@@ -15,7 +15,7 @@ import uk.me.webpigeon.wolf.newcode.players.BeliefSystem;
 /**
  * Vote for a random player we know not to be a "safe" role
  */
-public class LynchPrioityTargets implements Behavour {
+public class LynchPrioityTargets implements ProductionRule {
 	private String ourRole;
 	
 	private Map<String, Integer> scores;
@@ -39,9 +39,9 @@ public class LynchPrioityTargets implements Behavour {
 	}
 	
 	@Override
-	public boolean canActivate(AbstractPlayer player1, BeliefSystem myPlayer, String setBy) {
+	public boolean canActivate(BeliefSystem myPlayer, String setBy) {
 		
-		if (!player1.isState(GameState.DAYTIME) || !player1.isRole(ourRole) ){
+		if (!myPlayer.isInState(GameState.DAYTIME) || !myPlayer.isRole(ourRole) ){
 			return false;
 		}
 		
@@ -50,7 +50,7 @@ public class LynchPrioityTargets implements Behavour {
 	}
 
 	@Override
-	public ActionI generateAction(AbstractPlayer player1, BeliefSystem myPlayer) {
+	public ActionI generateAction(BeliefSystem myPlayer) {
 		if (targetMap == null || targetMap.isEmpty()) {
 			buildTargetMap(myPlayer);
 		}
