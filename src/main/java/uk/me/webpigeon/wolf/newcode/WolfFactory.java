@@ -3,6 +3,7 @@ package uk.me.webpigeon.wolf.newcode;
 import uk.me.webpigeon.wolf.newcode.actions.WolfUtils;
 import uk.me.webpigeon.wolf.newcode.legacy.LegacyUtils;
 import uk.me.webpigeon.wolf.newcode.players.AbstractPlayer;
+import uk.me.webpigeon.wolf.newcode.players.behavours.Behavour;
 import uk.me.webpigeon.wolf.newcode.players.behavours.BehavourPlayer;
 import uk.me.webpigeon.wolf.newcode.players.behavours.DebugAnnounceRole;
 import uk.me.webpigeon.wolf.newcode.players.behavours.EatSomeone;
@@ -21,31 +22,50 @@ public class WolfFactory {
 		WolfModel model = new WolfModel();
 		WolfController controller = new WolfController(model);
 
-		controller.addPlayer("Fred_bh", buildBehavourPlayer());
-		controller.addPlayer("John_bh", buildBehavourPlayer());
-		controller.addPlayer("Bob_bh", buildBehavourPlayer());
-		controller.addPlayer("Wolfgang_bh", buildBehavourPlayer());
-		controller.addPlayer("Pebbles_bh", buildBehavourPlayer());
-		controller.addPlayer("Jackie_bh", buildBehavourPlayer());
-		controller.addPlayer("Jess_bh", buildBehavourPlayer());
-		controller.addPlayer("Sarah_bh", buildBehavourPlayer());
+		controller.addPlayer("Fred", buildBehavourPlayer("Fred"));
+		controller.addPlayer("John", buildBehavourPlayer("John"));
+		controller.addPlayer("Bob", buildBehavourPlayer("Bob"));
+		controller.addPlayer("Wolfgang", buildBehavourPlayer("Wolfgang"));
+		controller.addPlayer("Pebbles", buildBehavourPlayer("Pebbles"));
+		controller.addPlayer("Jackie", buildBehavourPlayer("Jackie"));
+		controller.addPlayer("Jess", buildBehavourPlayer("Jess"));
+		controller.addPlayer("Sarah", buildBehavourPlayer("Sarah"));
 		
 		return controller;
 	}
 	
-	public static SessionManager buildBehavourPlayer() {
+	public static SessionManager buildBehavourPlayer(String name) {
+		Behavour[] behavours = new Behavour[] {
+				new SeerSavingAnnounce(),
+				new DebugAnnounceRole(),
+				new LieAboutRole(),
+				new EatSomeone(),
+				new LynchPrioityTargets("wolf", "seer"),
+				new LynchPrioityTargets("villager", "wolf"),
+				new LynchPrioityTargets("seer", "wolf"),
+				new RandomUnsafeLynch()
+		};
+		
+		return buildPlayer(name, behavours);
+	}
+	
+	public static SessionManager buildRandomPlayer(String name) {
+		Behavour[] behavours = new Behavour[] {
+				new RandomUnsafeLynch()
+		};
+		
+		return buildPlayer(name, behavours);
+	}
+	
+	public static SessionManager buildPlayer(String name, Behavour[] behavours) {
 		BehavourPlayer player = new BehavourPlayer();
-		player.addBehavour(new SeerSavingAnnounce());
-		player.addBehavour(new DebugAnnounceRole());
-		player.addBehavour(new LieAboutRole());
-		player.addBehavour(new EatSomeone());
-		player.addBehavour(new LynchPrioityTargets("wolf", "seer"));
-		player.addBehavour(new LynchPrioityTargets("villager", "wolf"));
-		player.addBehavour(new LynchPrioityTargets("seer", "wolf"));
-		player.addBehavour(new RandomUnsafeLynch());
+		
+		for (Behavour b : behavours) {
+			player.addBehavour(b);
+		}
 		
 		Thread t = new Thread(player);
-		t.setName("behavour-"+System.currentTimeMillis());
+		t.setName("behavour-"+name);
 		t.start();
 		
 		return player;
